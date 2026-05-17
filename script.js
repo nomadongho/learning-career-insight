@@ -164,6 +164,7 @@ const historyClearButton = document.querySelector('#history-clear-button');
 
 let latestResultSnapshot = null;
 let savedResultHistory = [];
+let snapshotCounter = 0;
 const emailValidationInput = document.createElement('input');
 emailValidationInput.type = 'email';
 
@@ -527,6 +528,10 @@ function renderSavedResultHistory() {
     const title = document.createElement('p');
     title.className = 'history-title';
     title.textContent = `${resultItem.styleResult.name} | ${resultItem.scores.CE}/${resultItem.scores.RO}/${resultItem.scores.AC}/${resultItem.scores.AE}`;
+    title.setAttribute(
+      'aria-label',
+      `Style ${resultItem.styleResult.name}, scores CE ${resultItem.scores.CE}, RO ${resultItem.scores.RO}, AC ${resultItem.scores.AC}, AE ${resultItem.scores.AE}`,
+    );
 
     const meta = document.createElement('p');
     meta.className = 'history-meta';
@@ -546,10 +551,12 @@ function renderSavedResultHistory() {
 
 function createResultSnapshot(scores, styleResult, testedAt) {
   const testedAtIso = toDate(testedAt).toISOString();
+  snapshotCounter += 1;
+  const fallbackId = `${Date.now()}-${Math.floor(performance.now() * 1000)}-${snapshotCounter}`;
   const snapshotId =
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+      : fallbackId;
   return {
     id: snapshotId,
     scores: { ...scores },
