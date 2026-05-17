@@ -57,9 +57,10 @@ const FACTOR_GROUPS = {
     'highInitialSalary',
     'intellectualChallenge',
     'aptitudeForCareer',
+    'previousWorkExperience',
+    'parentsOccupations',
   ],
   workConditionsAndStability: [
-    'previousWorkExperience',
     'availabilityOfEmployment',
     'opportunitiesForPromotions',
     'adequateLeisureTime',
@@ -73,7 +74,6 @@ const FACTOR_GROUPS = {
     'opportunityToHelpOthers',
     'opportunityToWorkWithPublic',
     'beingPartOfTeam',
-    'parentsOccupations',
   ],
 };
 
