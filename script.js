@@ -335,6 +335,8 @@ function renderAxisChart(styleResult) {
   const pointY = center - styleResult.vertical * scale;
 
   axisChart.innerHTML = `
+    <title id="axis-chart-title">Learning style graph</title>
+    <desc id="axis-chart-desc">A two-axis graph showing your position between concrete and abstract learning, and between reflective and active learning.</desc>
     <rect x="0" y="0" width="320" height="320" rx="24" fill="#f8fbff"></rect>
     <text x="160" y="24" text-anchor="middle" font-size="12" fill="#4f5d75">AE</text>
     <text x="160" y="308" text-anchor="middle" font-size="12" fill="#4f5d75">RO</text>
@@ -347,8 +349,8 @@ function renderAxisChart(styleResult) {
     <line x1="160" y1="34" x2="160" y2="286" stroke="#90a4c4" stroke-width="2"></line>
     <line x1="34" y1="160" x2="286" y2="160" stroke="#90a4c4" stroke-width="2"></line>
     <rect x="42" y="42" width="236" height="236" rx="18" fill="none" stroke="#d8e3f2" stroke-width="2" stroke-dasharray="6 8"></rect>
-    <circle cx="${pointX}" cy="${pointY}" r="8" fill="#2563eb"></circle>
     <circle cx="${pointX}" cy="${pointY}" r="16" fill="rgba(37, 99, 235, 0.16)"></circle>
+    <circle cx="${pointX}" cy="${pointY}" r="8" fill="#2563eb"></circle>
     <text x="${Math.min(pointX + 14, 280)}" y="${Math.max(pointY - 12, 24)}" font-size="12" font-weight="700" fill="#14213d">You</text>
   `;
 }
