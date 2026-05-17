@@ -617,6 +617,10 @@ button:not(.rank-btn):not(.word-hint):active {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.bar-chart-triple {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .bar-group {
   display: grid;
   gap: 10px;
