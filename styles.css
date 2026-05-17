@@ -374,6 +374,7 @@ button:not(.rank-btn):not(.word-hint):active {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   text-align: left;
+  cursor: pointer;
 }
 
 .option-grid-scale .option-label {
