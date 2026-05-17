@@ -3,49 +3,141 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Basic Website</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <title>Learning Styles Assessment</title>
+    <link rel="stylesheet" href="/home/runner/work/test/test/styles.css" />
   </head>
   <body>
     <header class="hero">
-      <p class="eyebrow">Basic Website</p>
-      <h1>A simple website you can launch without a platform</h1>
-      <p class="description">
-        A clean starting point with an intro, key highlights, and contact
-        details.
-      </p>
-      <a class="button" href="#contact">Contact</a>
+      <div class="hero-copy">
+        <p class="eyebrow">Assessment 1 of 3</p>
+        <h1>Learning Styles Assessment</h1>
+        <p class="description">
+          Rank four descriptions in each row from 1 to 4, then review your
+          learning profile and final graph.
+        </p>
+        <a class="button" href="#assessment">Start assessment</a>
+      </div>
+      <div class="hero-card">
+        <h2>Scoring guide</h2>
+        <ul>
+          <li>4 = most like you</li>
+          <li>3 = second most like you</li>
+          <li>2 = third most like you</li>
+          <li>1 = least like you</li>
+        </ul>
+        <p>Each row must use all four numbers exactly once.</p>
+      </div>
     </header>
 
-    <main>
-      <section class="section">
-        <h2>About</h2>
-        <p>
-          This is a plain static website with no external platform or complex
-          framework required.
-        </p>
+    <main class="page-shell">
+      <section class="panel intro-panel">
+        <div>
+          <p class="section-label">About this test</p>
+          <h2>Discover how you prefer to learn</h2>
+          <p>
+            This version is based on the learning styles worksheet you shared.
+            Your answers are grouped into four dimensions: Concrete Experience,
+            Reflective Observation, Abstract Conceptualization, and Active
+            Experimentation.
+          </p>
+        </div>
+        <div class="legend-grid">
+          <article class="legend-card">
+            <h3>CE</h3>
+            <p>Concrete Experience</p>
+          </article>
+          <article class="legend-card">
+            <h3>RO</h3>
+            <p>Reflective Observation</p>
+          </article>
+          <article class="legend-card">
+            <h3>AC</h3>
+            <p>Abstract Conceptualization</p>
+          </article>
+          <article class="legend-card">
+            <h3>AE</h3>
+            <p>Active Experimentation</p>
+          </article>
+        </div>
       </section>
 
-      <section class="section cards">
-        <article class="card">
-          <h2>Quick Start</h2>
-          <p>Publish a simple page quickly with only the essentials.</p>
-        </article>
-        <article class="card">
-          <h2>Easy Control</h2>
-          <p>Update the content yourself without relying on extra tools.</p>
-        </article>
-        <article class="card">
-          <h2>Ready to Grow</h2>
-          <p>Add more sections or pages later as your website expands.</p>
-        </article>
+      <section class="panel" id="assessment">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">Question set</p>
+            <h2>Rank every row</h2>
+          </div>
+          <p id="progress-text" class="progress-text">0 of 9 rows complete</p>
+        </div>
+
+        <form id="assessment-form" novalidate>
+          <div id="question-list" class="question-list"></div>
+
+          <p id="form-error" class="form-error" aria-live="polite"></p>
+
+          <div class="actions">
+            <button class="button" type="submit">Show my result</button>
+            <button class="button button-secondary" type="button" id="reset-button">
+              Reset answers
+            </button>
+          </div>
+        </form>
       </section>
 
-      <section class="section contact" id="contact">
-        <h2>Contact</h2>
-        <p>Email: hello@example.com</p>
-        <p>Phone: 010-1234-5678</p>
+      <section class="panel results-panel hidden" id="results" aria-live="polite">
+        <div class="section-heading results-heading">
+          <div>
+            <p class="section-label">Result</p>
+            <h2>Your learning profile</h2>
+          </div>
+          <a class="text-link" href="#assessment">Edit answers</a>
+        </div>
+
+        <div class="score-grid" id="score-grid"></div>
+
+        <div class="result-summary">
+          <article class="summary-card accent-card">
+            <p class="summary-label">Dominant learning style</p>
+            <h3 id="style-name">—</h3>
+            <p id="style-combo" class="summary-value"></p>
+            <p id="style-description"></p>
+          </article>
+          <article class="summary-card">
+            <p class="summary-label">Graph coordinates</p>
+            <p class="summary-value" id="axis-summary">—</p>
+            <p>
+              Horizontal axis uses AC − CE. Vertical axis uses AE − RO.
+            </p>
+          </article>
+        </div>
+
+        <div class="chart-grid">
+          <article class="chart-card">
+            <div class="chart-heading">
+              <h3>Dimension totals</h3>
+              <p>Higher bars show stronger preference in that dimension.</p>
+            </div>
+            <div id="bar-chart" class="bar-chart"></div>
+          </article>
+
+          <article class="chart-card">
+            <div class="chart-heading">
+              <h3>Final graph</h3>
+              <p>Quadrant view of your learning orientation.</p>
+            </div>
+            <div class="axis-chart-wrap">
+              <svg id="axis-chart" viewBox="0 0 320 320" role="img" aria-labelledby="axis-chart-title axis-chart-desc">
+                <title id="axis-chart-title">Learning style graph</title>
+                <desc id="axis-chart-desc">
+                  A two-axis graph showing your position between concrete and abstract learning, and between reflective and active learning.
+                </desc>
+              </svg>
+            </div>
+          </article>
+        </div>
       </section>
     </main>
+
+    <script src="/home/runner/work/test/test/script.js"></script>
   </body>
 </html>
