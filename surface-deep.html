@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Surface vs Deep Learners</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Assessment 2 of 3</p>
+        <h1>Surface vs Deep Learners</h1>
+        <p class="description">
+          Answer all 20 statements using A–E. Then check whether your current study approach is deeper or more surface-level.
+        </p>
+        <div class="hero-actions">
+          <a class="button" href="#assessment">Start assessment</a>
+          <a class="button button-secondary" href="./surface-deep-history.html">View saved results</a>
+          <a class="button button-secondary" href="./index.html">Back to assessment 1</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h2>Response guide</h2>
+        <ul>
+          <li>A = never or rarely true</li>
+          <li>B = sometimes true</li>
+          <li>C = true about half the time</li>
+          <li>D = frequently true</li>
+          <li>E = always/almost always true</li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="panel" id="assessment">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">Question set</p>
+            <h2>Choose A–E for every statement</h2>
+          </div>
+          <div class="progress-wrap">
+            <p id="surface-progress-label" class="progress-text">0 of 20 answered</p>
+            <div class="progress-bar-track" aria-hidden="true">
+              <div id="surface-progress-fill" class="progress-bar-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <form id="surface-assessment-form" novalidate>
+          <div id="surface-question-list" class="question-list"></div>
+          <p id="surface-form-error" class="form-error" aria-live="polite"></p>
+          <div class="actions">
+            <button class="button" type="submit">Show my result</button>
+            <button class="button button-secondary" type="button" id="surface-reset-button">Reset answers</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel results-panel hidden" id="surface-results" aria-live="polite">
+        <div class="section-heading results-heading">
+          <div>
+            <p class="section-label">Result</p>
+            <h2>Your study approach profile</h2>
+          </div>
+          <a class="text-link" href="#assessment">Edit answers</a>
+        </div>
+
+        <div class="result-summary">
+          <article class="summary-card accent-card">
+            <p class="summary-label">Dominant approach</p>
+            <h3 id="surface-dominant-type">—</h3>
+            <p class="summary-value" id="surface-score-summary">—</p>
+            <p id="surface-dominant-description"></p>
+          </article>
+          <article class="summary-card">
+            <p class="summary-label">Tested at</p>
+            <p class="summary-value" id="surface-tested-at">—</p>
+          </article>
+        </div>
+
+        <article class="chart-card">
+          <div class="chart-heading">
+            <h3>Deep vs Surface totals</h3>
+            <p>Higher score indicates your stronger current tendency.</p>
+          </div>
+          <div id="surface-bar-chart" class="bar-chart bar-chart-dual"></div>
+        </article>
+
+        <article class="summary-card result-share-card">
+          <p class="summary-label">Result sharing</p>
+          <div class="share-actions">
+            <input
+              id="surface-email-recipient"
+              class="email-input"
+              type="email"
+              placeholder="recipient@example.com (optional)"
+              autocomplete="email"
+            />
+            <button class="button button-secondary" type="button" id="surface-email-send-button">Email this result</button>
+          </div>
+          <p id="surface-email-error" class="share-error" aria-live="polite"></p>
+        </article>
+
+        <article class="summary-card result-history-card">
+          <div class="history-header">
+            <p class="summary-label">Saved results</p>
+            <button class="button button-secondary history-clear-button" type="button" id="surface-history-clear-button">
+              Clear history
+            </button>
+          </div>
+          <p id="surface-history-empty" class="history-empty">No saved results yet.</p>
+          <ul id="surface-history-list" class="history-list"></ul>
+        </article>
+      </section>
+    </main>
+
+    <script src="./surface-deep-history-store.js"></script>
+    <script src="./surface-deep.js"></script>
+  </body>
+</html>

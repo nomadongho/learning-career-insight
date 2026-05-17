@@ -361,6 +361,22 @@ button:not(.rank-btn):not(.word-hint):active {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.option-grid-scale {
+  grid-template-columns: 1fr;
+}
+
+.option-grid-scale .option-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  text-align: left;
+}
+
+.option-grid-scale .option-label {
+  justify-content: flex-start;
+  font-size: 0.9rem;
+}
+
 .option-card {
   display: flex;
   flex-direction: column;
@@ -595,6 +611,10 @@ button:not(.rank-btn):not(.word-hint):active {
   align-items: end;
   min-height: 260px;
   padding-top: 12px;
+}
+
+.bar-chart-dual {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .bar-group {
@@ -836,6 +856,10 @@ button:focus,
   .legend-grid,
   .score-grid,
   .bar-chart {
+    grid-template-columns: 1fr;
+  }
+
+  .bar-chart-dual {
     grid-template-columns: 1fr;
   }
 
