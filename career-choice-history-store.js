@@ -1,12 +1,12 @@
 (function initCareerChoiceResultHistoryStore() {
-  const storageKey = 'careerChoiceResultHistory.v2';
+  const storageKey = 'careerChoiceResultHistory.v3';
   const limit = 30;
   const dominantFactorLabels = {
-    personalFitAndRewards: 'Personal fit & rewards',
-    workConditionsAndStability: 'Work conditions & stability',
-    socialAndServiceOrientation: 'Social service & collaboration',
-    socialInfluence: 'Social influence sources',
-    balanced: 'Balanced influences',
+    extrinsic:     'Extrinsic',
+    intrinsic:     'Intrinsic',
+    interpersonal: 'Interpersonal',
+    other:         'Other',
+    balanced:      'Balanced influences',
   };
 
   const allItemIds = [
@@ -17,10 +17,15 @@
   ];
 
   const factorScoreKeys = [
-    'personalFitAndRewards',
-    'workConditionsAndStability',
-    'socialAndServiceOrientation',
-    'socialInfluence',
+    'prestigeFinancial',
+    'securityOfEmployment',
+    'workLifeBalance',
+    'selfFulfilment',
+    'goodCitizen',
+    'looseRelations',
+    'closeRelations',
+    'predisposition',
+    'travel',
   ];
 
   function toDate(value) {
@@ -92,12 +97,18 @@
   }
 
   function formatScoreSummary(factorScores) {
-    return [
-      `Personal ${factorScores.personalFitAndRewards.toFixed(1)}`,
-      `Practical ${factorScores.workConditionsAndStability.toFixed(1)}`,
-      `Social ${factorScores.socialAndServiceOrientation.toFixed(1)}`,
-      `Influence ${factorScores.socialInfluence.toFixed(1)}`,
-    ].join(' · ');
+    const constructGroups = {
+      Extrinsic:     ['prestigeFinancial', 'securityOfEmployment', 'workLifeBalance'],
+      Intrinsic:     ['selfFulfilment', 'goodCitizen'],
+      Interpersonal: ['looseRelations', 'closeRelations'],
+      Other:         ['predisposition', 'travel'],
+    };
+    return Object.entries(constructGroups)
+      .map(([label, keys]) => {
+        const avg = keys.reduce((s, k) => s + factorScores[k], 0) / keys.length;
+        return `${label} ${avg.toFixed(2)}`;
+      })
+      .join(' · ');
   }
 
   window.careerChoiceResultHistoryStore = {
