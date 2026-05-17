@@ -1,3 +1,42 @@
+const wordDefinitions = {
+  involved: 'Fully engaged and actively taking part in what is happening.',
+  tentative: 'Cautious and unsure; preferring to try carefully before committing.',
+  discriminating: 'Carefully noticing differences and making thoughtful judgments.',
+  practical: 'Focused on real-world results and what actually works.',
+  receptive: 'Open and willing to take in new ideas or experiences.',
+  impartial: 'Fair and neutral; able to see all sides without bias.',
+  analytical: 'Breaking things down step by step to understand them deeply.',
+  relevant: 'Focused on what directly matters or applies to the situation.',
+  feeling: 'Learning through personal emotions and gut reactions.',
+  watching: 'Learning by observing carefully before acting.',
+  thinking: 'Learning through reasoning, concepts, and mental models.',
+  doing: 'Learning by jumping in and trying things out directly.',
+  accepting: 'Willing to take things as they are, without needing to change them.',
+  aware: 'Highly attentive to what is happening around you.',
+  evaluative: 'Constantly assessing and judging based on clear criteria.',
+  'risk-taker': 'Comfortable trying new things even when the outcome is uncertain.',
+  intuitive: 'Trusting gut feelings and instincts rather than step-by-step logic.',
+  questioning: 'Always asking "why" and challenging assumptions.',
+  logical: 'Following clear, structured reasoning to reach conclusions.',
+  productive: 'Focused on getting things done and achieving results efficiently.',
+  concrete: 'Preferring real, hands-on, tangible experiences over theories.',
+  observing: 'Learning by watching carefully from the sidelines.',
+  abstract: 'Thinking in broad concepts, theories, and big-picture ideas.',
+  active: 'Learning best through movement, action, and direct involvement.',
+  'present-oriented': 'Focused on what is happening right now, in this moment.',
+  reflecting: 'Taking time to look back and think carefully about what happened.',
+  'future-oriented': 'Thinking ahead and planning for what comes next.',
+  pragmatic: 'Practical and results-driven; focused on what works in practice.',
+  experience: 'Learning from direct, personal involvement in real events.',
+  observation: 'Learning by watching and gathering information carefully.',
+  conceptualization: 'Learning by forming ideas and building abstract mental models.',
+  experimentation: 'Learning by testing ideas and trying different approaches.',
+  intense: 'Deeply focused and fully absorbed in what you are doing.',
+  reserved: 'Quiet and thoughtful; preferring to observe before speaking or acting.',
+  rational: 'Making decisions based on logic and reason rather than emotion.',
+  responsible: 'Reliable and accountable; taking ownership of tasks and actions.',
+};
+
 const assessmentRows = [
   {
     id: 1,
@@ -113,6 +152,81 @@ const axisSummary = document.querySelector('#axis-summary');
 const axisDesc = document.querySelector('#axis-desc');
 const resetButton = document.querySelector('#reset-button');
 
+// ── Word tooltip ──────────────────────────────────────────────────────────────
+const TOOLTIP_VIEWPORT_PAD = 8;
+const TOOLTIP_FLIP_CLEARANCE = 16;
+const TOOLTIP_SPACING = 10;
+
+const wordTooltip = document.createElement('div');
+wordTooltip.className = 'word-tooltip hidden';
+wordTooltip.setAttribute('role', 'tooltip');
+document.body.appendChild(wordTooltip);
+
+let activeHintBtn = null;
+
+function showWordTooltip(btn) {
+  const word = btn.dataset.word;
+  const def = wordDefinitions[word.toLowerCase()];
+  if (!def) return;
+
+  activeHintBtn = btn;
+
+  wordTooltip.innerHTML = '';
+  const titleEl = document.createElement('p');
+  titleEl.className = 'word-tooltip-title';
+  titleEl.textContent = word;
+  const bodyEl = document.createElement('p');
+  bodyEl.className = 'word-tooltip-body';
+  bodyEl.textContent = def;
+  wordTooltip.append(titleEl, bodyEl);
+  wordTooltip.classList.remove('hidden', 'word-tooltip--below');
+
+  // Measure tooltip height, then position it
+  const tooltipRect = wordTooltip.getBoundingClientRect();
+  const btnRect = btn.getBoundingClientRect();
+
+  let centerX = btnRect.left + btnRect.width / 2;
+  const halfW = tooltipRect.width / 2;
+  const clampedX = Math.max(halfW + TOOLTIP_VIEWPORT_PAD, Math.min(centerX, window.innerWidth - halfW - TOOLTIP_VIEWPORT_PAD));
+
+  // Arrow stays aligned with the button center even if tooltip shifted
+  const arrowOffset = centerX - clampedX;
+  wordTooltip.style.setProperty('--arrow-offset', `${arrowOffset}px`);
+  wordTooltip.style.left = `${clampedX}px`;
+
+  const spaceAbove = btnRect.top;
+  if (spaceAbove < tooltipRect.height + TOOLTIP_FLIP_CLEARANCE) {
+    // Not enough room above – show below
+    wordTooltip.classList.add('word-tooltip--below');
+    wordTooltip.style.top = `${btnRect.bottom + TOOLTIP_SPACING}px`;
+  } else {
+    wordTooltip.style.top = `${btnRect.top - tooltipRect.height - TOOLTIP_SPACING}px`;
+  }
+}
+
+function hideWordTooltip() {
+  wordTooltip.classList.add('hidden');
+  activeHintBtn = null;
+}
+
+document.addEventListener('click', (event) => {
+  const hintBtn = event.target.closest('.word-hint');
+  if (hintBtn) {
+    event.stopPropagation();
+    if (activeHintBtn === hintBtn) {
+      hideWordTooltip();
+    } else {
+      showWordTooltip(hintBtn);
+    }
+    return;
+  }
+  if (!event.target.closest('.word-tooltip')) {
+    hideWordTooltip();
+  }
+});
+
+// ── /Word tooltip ─────────────────────────────────────────────────────────────
+
 function updateRankButtons(rowIndex) {
   const rowAnswers = answers[rowIndex];
   const card = questionList.querySelector(`[data-row="${rowIndex}"]`);
@@ -176,7 +290,19 @@ function renderQuestions() {
 
       const label = document.createElement('p');
       label.className = 'option-label';
-      label.textContent = labelText;
+      const labelSpan = document.createElement('span');
+      labelSpan.textContent = labelText;
+      label.append(labelSpan);
+
+      if (wordDefinitions[labelText.toLowerCase()]) {
+        const hintBtn = document.createElement('button');
+        hintBtn.type = 'button';
+        hintBtn.className = 'word-hint';
+        hintBtn.textContent = '?';
+        hintBtn.dataset.word = labelText;
+        hintBtn.setAttribute('aria-label', `What does "${labelText}" mean?`);
+        label.append(hintBtn);
+      }
 
       const rankGroup = document.createElement('div');
       rankGroup.className = 'rank-group';
