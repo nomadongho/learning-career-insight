@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Surface vs Deep Result History</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="history-page">
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">Result history</p>
+            <h1>Surface vs Deep saved results</h1>
+          </div>
+          <a class="button button-secondary" href="./surface-deep.html">Back to assessment 2</a>
+        </div>
+
+        <div class="history-header">
+          <p class="summary-label">Saved results</p>
+          <button class="button button-secondary history-clear-button" type="button" id="surface-history-page-clear-button">
+            Clear history
+          </button>
+        </div>
+        <p id="surface-history-page-empty" class="history-empty">
+          No saved results yet. Submitted results are stored locally on this browser.
+        </p>
+        <ul id="surface-history-page-list" class="history-list"></ul>
+      </section>
+    </main>
+
+    <script src="./deep-surface-history-store.js"></script>
+    <script src="./surface-deep-history.js"></script>
+  </body>
+</html>
