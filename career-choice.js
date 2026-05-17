@@ -207,7 +207,7 @@ function renderQuestions() {
 
       const label = document.createElement('p');
       label.className = 'option-label';
-      label.textContent = `${option.value}: ${option.text}`;
+      label.textContent = option.text;
 
       const button = document.createElement('button');
       button.type = 'button';
