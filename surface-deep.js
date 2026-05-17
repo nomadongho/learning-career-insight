@@ -211,6 +211,7 @@ function createResultSnapshot(resultValues, testedAt) {
   return {
     id: snapshotId,
     nickname: nicknameInput.value.trim(),
+    responses: [...answers],
     deepTotal: resultValues.deepTotal,
     surfaceTotal: resultValues.surfaceTotal,
     dominantType: resultValues.dominantType,
@@ -300,7 +301,10 @@ function appendResultToHistory(snapshot) {
 function loadResultById(resultId) {
   const savedResult = savedHistory.find((item) => item.id === resultId);
   if (!savedResult) return;
-  latestResultSnapshot = { ...savedResult };
+  latestResultSnapshot = {
+    ...savedResult,
+    responses: Array.isArray(savedResult.responses) ? [...savedResult.responses] : null,
+  };
   renderResult(
     {
       deepTotal: savedResult.deepTotal,
