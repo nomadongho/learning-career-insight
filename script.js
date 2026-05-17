@@ -452,6 +452,9 @@ function isValidEmailAddress(emailAddress) {
 
 function buildEmailBody(resultData) {
   const { scores, styleResult, testedAt } = resultData;
+  const styleInfo = styleMeta[styleResult.name] ?? {
+    combination: 'Unknown',
+  };
   const lines = [
     'Learning Styles Assessment Result',
     '',
@@ -459,7 +462,7 @@ function buildEmailBody(resultData) {
     '',
     'Dominant style',
     `- Name: ${styleResult.name}`,
-    `- Combination: ${styleMeta[styleResult.name].combination}`,
+    `- Combination: ${styleInfo.combination}`,
     '',
     'Dimension totals',
     `- CE: ${scores.CE}`,
@@ -671,7 +674,10 @@ function renderResults(scores, styleResult, testedAt) {
   renderBarChart(scores);
   renderAxisChart(scores);
 
-  const style = styleMeta[styleResult.name];
+  const style = styleMeta[styleResult.name] ?? {
+    combination: 'Unknown',
+    description: 'No style description is available for this result.',
+  };
   styleName.textContent = styleResult.name;
   styleCombo.textContent = style.combination;
   styleDescription.textContent = style.description;
