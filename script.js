@@ -526,7 +526,7 @@ function renderSavedResultHistory() {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${resultItem.styleResult.name} · ${resultItem.scores.CE}/${resultItem.scores.RO}/${resultItem.scores.AC}/${resultItem.scores.AE}`;
+    title.textContent = `${resultItem.styleResult.name} | ${resultItem.scores.CE}/${resultItem.scores.RO}/${resultItem.scores.AC}/${resultItem.scores.AE}`;
 
     const meta = document.createElement('p');
     meta.className = 'history-meta';
@@ -546,8 +546,12 @@ function renderSavedResultHistory() {
 
 function createResultSnapshot(scores, styleResult, testedAt) {
   const testedAtIso = toDate(testedAt).toISOString();
+  const snapshotId =
+    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
   return {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`,
+    id: snapshotId,
     scores: { ...scores },
     styleResult: { ...styleResult },
     testedAt: testedAtIso,
