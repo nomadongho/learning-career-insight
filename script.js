@@ -445,7 +445,7 @@ function formatEmailSubjectDate(dateValue) {
   }).format(dateValue);
 }
 
-function isValidEmailAddress(emailAddress) {
+function isValidOrEmptyEmailAddress(emailAddress) {
   if (!emailAddress) return true;
   emailValidationInput.value = emailAddress;
   return emailValidationInput.checkValidity();
@@ -457,6 +457,7 @@ function buildEmailBody(resultData) {
     combination: 'Unknown',
     description: 'No style description is available for this result.',
   };
+  const toPercent = (score) => `${Math.round((score / MAX_SCORE) * 100)}%`;
   const lines = [
     'Learning Styles Assessment Result',
     '',
@@ -473,7 +474,7 @@ function buildEmailBody(resultData) {
     `- AE: ${scores.AE}`,
     '',
     'Graph data for comparison',
-    `- Bar chart values: CE=${scores.CE}, RO=${scores.RO}, AC=${scores.AC}, AE=${scores.AE}`,
+    `- Bar chart percentages: CE=${toPercent(scores.CE)}, RO=${toPercent(scores.RO)}, AC=${toPercent(scores.AC)}, AE=${toPercent(scores.AE)}`,
     `- Diamond axis values: AE(top)=${scores.AE}, AC(right)=${scores.AC}, RO(bottom)=${scores.RO}, CE(left)=${scores.CE}`,
     '',
     'Orientation',
@@ -490,7 +491,7 @@ function sendResultByEmail() {
   }
 
   const recipient = emailRecipientInput.value.trim();
-  if (!isValidEmailAddress(recipient)) {
+  if (!isValidOrEmptyEmailAddress(recipient)) {
     emailError.textContent = 'Please enter a valid email address or leave it empty.';
     return;
   }
