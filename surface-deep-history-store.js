@@ -8,9 +8,15 @@
     return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
   }
 
+  function normalizeResponses(rawResponses) {
+    if (!Array.isArray(rawResponses)) return null;
+    if (!rawResponses.every((value) => typeof value === 'string')) return null;
+    return [...rawResponses];
+  }
+
   function normalize(rawResult) {
     if (!rawResult || typeof rawResult !== 'object') return null;
-    const { id, deepTotal, surfaceTotal, dominantType, testedAt, nickname } = rawResult;
+    const { id, deepTotal, surfaceTotal, dominantType, testedAt, nickname, responses } = rawResult;
     const testedAtDate = toDate(testedAt);
     if (
       !id ||
@@ -21,10 +27,15 @@
     ) {
       return null;
     }
+    const normalizedResponses = normalizeResponses(responses);
+    if (responses !== undefined && !normalizedResponses) {
+      return null;
+    }
 
     return {
       id: String(id),
       nickname: typeof nickname === 'string' ? nickname : '',
+      responses: normalizedResponses,
       deepTotal,
       surfaceTotal,
       dominantType,

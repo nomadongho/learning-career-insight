@@ -517,6 +517,7 @@ function createResultSnapshot(scores, styleResult, testedAt) {
   return {
     id: snapshotId,
     nickname: nicknameInput.value.trim(),
+    selections: answers.map((row) => [...row]),
     scores: { ...scores },
     styleResult: { ...styleResult },
     testedAt: testedAtIso,
@@ -535,6 +536,9 @@ function loadSavedResultById(resultId) {
   latestResultSnapshot = {
     id: savedResult.id,
     nickname: savedResult.nickname || '',
+    selections: Array.isArray(savedResult.selections)
+      ? savedResult.selections.map((row) => (Array.isArray(row) ? [...row] : []))
+      : null,
     scores: { ...savedResult.scores },
     styleResult: { ...savedResult.styleResult },
     testedAt: savedResult.testedAt,
