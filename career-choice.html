@@ -15,7 +15,7 @@
         <p class="eyebrow">Assessment 3 of 3</p>
         <h1>3 Factors of Career Choice</h1>
         <p class="description">
-          Enter your intended career, then rate how strongly each source influences your career decision.
+          Enter your intended career, then rate each item on the two questionnaires below.
         </p>
         <div class="hero-actions">
           <a class="button" href="#assessment">Start assessment</a>
@@ -25,12 +25,21 @@
       </div>
       <div class="hero-card">
         <h2>Response guide</h2>
+        <p class="summary-label">Importance (v1–v26)</p>
+        <ul>
+          <li>5 = very important</li>
+          <li>4 = important</li>
+          <li>3 = not so important</li>
+          <li>2 = unimportant</li>
+          <li>1 = very unimportant</li>
+        </ul>
+        <p class="summary-label summary-label-spaced">Influence (q1–q7)</p>
         <ul>
           <li>5 = very influential</li>
           <li>4 = influential</li>
           <li>3 = not so influential</li>
-          <li>2 = unimportant</li>
-          <li>1 = very unimportant</li>
+          <li>2 = uninfluential</li>
+          <li>1 = very uninfluential</li>
         </ul>
       </div>
     </header>
@@ -43,7 +52,7 @@
             <h2>Rate each influence source</h2>
           </div>
           <div class="progress-wrap">
-            <p id="career-progress-label" class="progress-text">0 of 21 answered</p>
+            <p id="career-progress-label" class="progress-text">0 of 33 answered</p>
             <div class="progress-bar-track" aria-hidden="true">
               <div id="career-progress-fill" class="progress-bar-fill" style="width: 0%"></div>
             </div>
@@ -123,7 +132,7 @@
             <h3>Average influence by factor (1–5)</h3>
             <p>Higher score means stronger influence in your current career choice.</p>
           </div>
-          <div id="career-bar-chart" class="bar-chart bar-chart-triple"></div>
+          <div id="career-bar-chart" class="bar-chart"></div>
         </article>
 
         <article class="summary-card result-history-card">

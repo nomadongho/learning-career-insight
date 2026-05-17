@@ -1,79 +1,89 @@
+// Section 1 (v1–v26): How important are the following factors to you in choosing a career?
+// Section 2 (q1–q7):  How influential are the following to you in choosing a career?
 const careerChoiceItems = [
-  { id: 'longRangeEarningPotential', label: 'Good long-range earning potential' },
-  { id: 'costOfEducation', label: 'Cost of education' },
-  { id: 'jobSatisfaction', label: 'Job satisfaction' },
-  { id: 'senseOfCareer', label: 'Sense of career' },
-  { id: 'yearsOfFormalEducation', label: 'Years of formal education' },
-  { id: 'highInitialSalary', label: 'High initial salary' },
-  { id: 'intellectualChallenge', label: 'Intellectual challenge' },
-  { id: 'aptitudeForCareer', label: 'Aptitude for career (fit for subject)' },
-  { id: 'previousWorkExperience', label: 'Previous work experience' },
-  { id: 'availabilityOfEmployment', label: 'Availability of employment' },
-  { id: 'opportunitiesForPromotions', label: 'Opportunities for promotions' },
-  { id: 'adequateLeisureTime', label: 'Adequate leisure time' },
-  { id: 'opportunityToHelpOthers', label: 'Opportunity to help others' },
-  { id: 'opportunityToWorkWithPublic', label: 'Opportunity to work with the public' },
-  { id: 'beingPartOfTeam', label: 'Being part of a team' },
-  { id: 'opportunityToTravel', label: 'Opportunity to travel' },
-  { id: 'parentsOccupations', label: "Parents' occupations" },
-  { id: 'selfEmploymentOpportunities', label: 'Self employment opportunities' },
-  { id: 'jobSecurity', label: 'Job security' },
-  { id: 'varietyOfWork', label: 'Variety of work' },
-  { id: 'familyFriendlyWorkSchedule', label: 'Family friendly work schedule' },
+  { id: 'v1',  label: 'Status of career',                          scale: 'importance' },
+  { id: 'v2',  label: 'Good long-range earnings potential',         scale: 'importance' },
+  { id: 'v3',  label: 'High initial salary',                        scale: 'importance' },
+  { id: 'v4',  label: 'Chance to exercise leadership',              scale: 'importance' },
+  { id: 'v5',  label: 'Opportunities for promotion',                scale: 'importance' },
+  { id: 'v6',  label: 'Opportunity for self-employment',            scale: 'importance' },
+  { id: 'v7',  label: 'Adequate leisure time',                      scale: 'importance' },
+  { id: 'v8',  label: 'Family-friendly work schedules',             scale: 'importance' },
+  { id: 'v9',  label: 'Ease of gaining qualifications',             scale: 'importance' },
+  { id: 'v10', label: 'Cost of education',                          scale: 'importance' },
+  { id: 'v11', label: 'Years of formal education',                  scale: 'importance' },
+  { id: 'v12', label: 'Opportunity to work with the public',        scale: 'importance' },
+  { id: 'v13', label: 'Opportunity to help others',                 scale: 'importance' },
+  { id: 'v14', label: 'Being part of a team',                       scale: 'importance' },
+  { id: 'v15', label: 'Job security',                               scale: 'importance' },
+  { id: 'v16', label: 'Availability of employment',                 scale: 'importance' },
+  { id: 'v17', label: 'Good working conditions',                    scale: 'importance' },
+  { id: 'v18', label: 'Intellectual challenge',                     scale: 'importance' },
+  { id: 'v19', label: 'Aptitude for career (flair for subject)',    scale: 'importance' },
+  { id: 'v20', label: 'Job satisfaction',                           scale: 'importance' },
+  { id: 'v21', label: 'Variety of work',                            scale: 'importance' },
+  { id: 'v22', label: "Parents' occupation",                        scale: 'importance' },
+  { id: 'v23', label: 'Study of subject in school',                 scale: 'importance' },
+  { id: 'v24', label: 'Remaining in the area where I grew up',      scale: 'importance' },
+  { id: 'v25', label: 'Previous work experience',                   scale: 'importance' },
+  { id: 'v26', label: 'Opportunity to travel',                      scale: 'importance' },
+  { id: 'q1',  label: 'Parents',                                    scale: 'influence' },
+  { id: 'q2',  label: 'Teachers',                                   scale: 'influence' },
+  { id: 'q3',  label: 'Peers and friends',                          scale: 'influence' },
+  { id: 'q4',  label: 'Relatives and family friends',               scale: 'influence' },
+  { id: 'q5',  label: 'Career guidance counsellors',                scale: 'influence' },
+  { id: 'q6',  label: 'Visiting speakers',                          scale: 'influence' },
+  { id: 'q7',  label: 'Promotional material',                       scale: 'influence' },
 ];
 
-const CAREER_SCALE_OPTIONS = [
-  { value: 5, text: 'Very influential' },
-  { value: 4, text: 'Influential' },
-  { value: 3, text: 'Not so influential' },
+const IMPORTANCE_SCALE_OPTIONS = [
+  { value: 5, text: 'Very important' },
+  { value: 4, text: 'Important' },
+  { value: 3, text: 'Not so important' },
   { value: 2, text: 'Unimportant' },
   { value: 1, text: 'Very unimportant' },
 ];
 
+const INFLUENCE_SCALE_OPTIONS = [
+  { value: 5, text: 'Very influential' },
+  { value: 4, text: 'Influential' },
+  { value: 3, text: 'Not so influential' },
+  { value: 2, text: 'Uninfluential' },
+  { value: 1, text: 'Very uninfluential' },
+];
+
 const FACTOR_LABELS = {
-  personalFitAndRewards: 'Personal background & rewards',
-  workConditionsAndStability: 'Work environment & stability',
-  socialAndServiceOrientation: 'Social impact & collaboration',
+  personalFitAndRewards: 'Personal fit & rewards',
+  workConditionsAndStability: 'Work conditions & stability',
+  socialAndServiceOrientation: 'Social service & collaboration',
+  socialInfluence: 'Social influence sources',
   balanced: 'Balanced influences',
 };
 
 const FACTOR_DESCRIPTIONS = {
   personalFitAndRewards:
-    'Your responses emphasize personal background, qualifications, and reward-oriented career priorities.',
+    'Your responses emphasize personal status, earnings, intellectual challenge, and career fit.',
   workConditionsAndStability:
-    'Your responses emphasize practical work conditions, career continuity, and long-term stability.',
+    'Your responses emphasize practical conditions, job security, and long-term stability.',
   socialAndServiceOrientation:
     'Your responses emphasize collaboration and helping/working with other people.',
+  socialInfluence:
+    'Your responses show strong influence from people and external sources around you.',
   balanced: 'Your factor scores are tied, so your current career decision appears balanced across multiple influences.',
 };
 
 const FACTOR_GROUPS = {
   personalFitAndRewards: [
-    'longRangeEarningPotential',
-    'costOfEducation',
-    'jobSatisfaction',
-    'senseOfCareer',
-    'yearsOfFormalEducation',
-    'highInitialSalary',
-    'intellectualChallenge',
-    'aptitudeForCareer',
-    'previousWorkExperience',
-    'parentsOccupations',
+    'v1', 'v2', 'v3', 'v4', 'v18', 'v19', 'v20', 'v21', 'v22', 'v25',
   ],
   workConditionsAndStability: [
-    'availabilityOfEmployment',
-    'opportunitiesForPromotions',
-    'adequateLeisureTime',
-    'opportunityToTravel',
-    'selfEmploymentOpportunities',
-    'jobSecurity',
-    'varietyOfWork',
-    'familyFriendlyWorkSchedule',
+    'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v15', 'v16', 'v17', 'v23', 'v24', 'v26',
   ],
   socialAndServiceOrientation: [
-    'opportunityToHelpOthers',
-    'opportunityToWorkWithPublic',
-    'beingPartOfTeam',
+    'v12', 'v13', 'v14',
+  ],
+  socialInfluence: [
+    'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7',
   ],
 };
 
@@ -142,7 +152,26 @@ function updateQuestionSelection(itemId) {
 function renderQuestions() {
   questionList.innerHTML = '';
 
-  careerChoiceItems.forEach((item, index) => {
+  let currentSection = null;
+
+  careerChoiceItems.forEach((item) => {
+    // Insert section header when scale changes
+    if (item.scale !== currentSection) {
+      currentSection = item.scale;
+      const header = document.createElement('div');
+      header.className = 'question-section-header';
+      const heading = document.createElement('p');
+      heading.className = 'question-section-title';
+      heading.textContent =
+        item.scale === 'importance'
+          ? 'How important are the following factors to you in choosing a career?'
+          : 'How influential are the following to you in choosing a career?';
+      header.append(heading);
+      questionList.append(header);
+    }
+
+    const scaleOptions = item.scale === 'influence' ? INFLUENCE_SCALE_OPTIONS : IMPORTANCE_SCALE_OPTIONS;
+
     const card = document.createElement('article');
     card.className = 'question-card';
     card.dataset.itemId = item.id;
@@ -155,7 +184,7 @@ function renderQuestions() {
 
     const badge = document.createElement('span');
     badge.className = 'row-badge';
-    badge.textContent = String(index + 1);
+    badge.textContent = item.id.toUpperCase();
 
     const prompt = document.createElement('p');
     prompt.className = 'question-note';
@@ -170,7 +199,7 @@ function renderQuestions() {
     const optionGrid = document.createElement('div');
     optionGrid.className = 'option-grid option-grid-scale';
 
-    CAREER_SCALE_OPTIONS.forEach((option) => {
+    scaleOptions.forEach((option) => {
       const optionCard = document.createElement('div');
       optionCard.className = 'option-card';
       optionCard.dataset.itemId = item.id;
@@ -224,7 +253,12 @@ function validateAnswers() {
 }
 
 function calculateFactorScores() {
-  const factorScores = { personalFitAndRewards: 0, workConditionsAndStability: 0, socialAndServiceOrientation: 0 };
+  const factorScores = {
+    personalFitAndRewards: 0,
+    workConditionsAndStability: 0,
+    socialAndServiceOrientation: 0,
+    socialInfluence: 0,
+  };
 
   Object.entries(FACTOR_GROUPS).forEach(([factorKey, itemIds]) => {
     const total = itemIds.reduce((sum, itemId) => sum + answers[itemId], 0);
@@ -274,7 +308,7 @@ function createResultSnapshot(career, factorScores, dominantFactor, testedAt) {
 function renderBarChart(factorScores) {
   barChart.innerHTML = '';
 
-  ['personalFitAndRewards', 'workConditionsAndStability', 'socialAndServiceOrientation'].forEach((key) => {
+  Object.keys(FACTOR_GROUPS).forEach((key) => {
     const labelText = FACTOR_LABELS[key];
     const value = factorScores[key];
 
@@ -392,9 +426,10 @@ function buildEmailBody(resultData) {
     `Tested at: ${formatTestedAt(resultData.testedAt)}`,
     `Dominant factor: ${dominantFactorTitle}`,
     '',
-    `Personal background & rewards: ${resultData.factorScores.personalFitAndRewards.toFixed(1)} / 5`,
-    `Work environment & stability: ${resultData.factorScores.workConditionsAndStability.toFixed(1)} / 5`,
-    `Social impact & collaboration: ${resultData.factorScores.socialAndServiceOrientation.toFixed(1)} / 5`,
+    `Personal fit & rewards: ${resultData.factorScores.personalFitAndRewards.toFixed(1)} / 5`,
+    `Work conditions & stability: ${resultData.factorScores.workConditionsAndStability.toFixed(1)} / 5`,
+    `Social service & collaboration: ${resultData.factorScores.socialAndServiceOrientation.toFixed(1)} / 5`,
+    `Social influence sources: ${resultData.factorScores.socialInfluence.toFixed(1)} / 5`,
   ].join('\n');
 }
 
