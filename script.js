@@ -100,7 +100,8 @@ const answers = assessmentRows.map(() => Array(4).fill(''));
 const questionList = document.querySelector('#question-list');
 const form = document.querySelector('#assessment-form');
 const formError = document.querySelector('#form-error');
-const progressText = document.querySelector('#progress-text');
+const progressText = document.querySelector('#progress-label');
+const progressBarFill = document.querySelector('#progress-bar-fill');
 const resultsSection = document.querySelector('#results');
 const scoreGrid = document.querySelector('#score-grid');
 const barChart = document.querySelector('#bar-chart');
@@ -109,28 +110,31 @@ const styleName = document.querySelector('#style-name');
 const styleCombo = document.querySelector('#style-combo');
 const styleDescription = document.querySelector('#style-description');
 const axisSummary = document.querySelector('#axis-summary');
+const axisDesc = document.querySelector('#axis-desc');
 const resetButton = document.querySelector('#reset-button');
 
-function createSelect(rowIndex, optionIndex) {
-  const select = document.createElement('select');
-  select.name = `row-${rowIndex}-option-${optionIndex}`;
-  select.dataset.rowIndex = String(rowIndex);
-  select.dataset.optionIndex = String(optionIndex);
-  select.setAttribute('aria-label', `Row ${rowIndex + 1} option ${optionIndex + 1}`);
+function updateRankButtons(rowIndex) {
+  const rowAnswers = answers[rowIndex];
+  const card = questionList.querySelector(`[data-row="${rowIndex}"]`);
+  if (!card) return;
 
-  const placeholder = document.createElement('option');
-  placeholder.value = '';
-  placeholder.textContent = 'Select rank';
-  select.append(placeholder);
+  card.querySelectorAll('.rank-btn').forEach((btn) => {
+    const optIndex = Number(btn.dataset.optionIndex);
+    const rank = btn.dataset.rank;
+    const isSelected = rowAnswers[optIndex] === rank;
+    const isUsedElsewhere = rowAnswers.some((a, i) => a === rank && i !== optIndex);
 
-  [1, 2, 3, 4].forEach((value) => {
-    const option = document.createElement('option');
-    option.value = String(value);
-    option.textContent = String(value);
-    select.append(option);
+    btn.classList.toggle('rank-selected', isSelected);
+    btn.classList.toggle('rank-taken', !isSelected && isUsedElsewhere);
   });
 
-  return select;
+  const isComplete = rowAnswers.every(Boolean);
+  card.classList.toggle('row-complete', isComplete);
+
+  const badge = card.querySelector('.row-badge');
+  if (badge) {
+    badge.textContent = isComplete ? '✓' : String(rowIndex + 1);
+  }
 }
 
 function renderQuestions() {
@@ -139,26 +143,29 @@ function renderQuestions() {
   assessmentRows.forEach((row, rowIndex) => {
     const card = document.createElement('article');
     card.className = 'question-card';
+    card.dataset.row = String(rowIndex);
 
     const top = document.createElement('div');
     top.className = 'question-top';
 
-    const heading = document.createElement('div');
-    const number = document.createElement('p');
-    number.className = 'question-number';
-    number.textContent = `Row ${row.id}`;
+    const left = document.createElement('div');
+    left.className = 'question-left';
+
+    const badge = document.createElement('span');
+    badge.className = 'row-badge';
+    badge.textContent = String(row.id);
 
     const note = document.createElement('p');
     note.className = 'question-note';
     note.textContent = row.prompt;
 
-    heading.append(number, note);
+    left.append(badge, note);
 
     const hint = document.createElement('p');
     hint.className = 'option-note';
-    hint.textContent = 'Use 1, 2, 3, and 4 exactly once.';
+    hint.textContent = 'Rank 1 – 4';
 
-    top.append(heading, hint);
+    top.append(left, hint);
 
     const optionGrid = document.createElement('div');
     optionGrid.className = 'option-grid';
@@ -167,56 +174,55 @@ function renderQuestions() {
       const optionCard = document.createElement('div');
       optionCard.className = 'option-card';
 
-      const label = document.createElement('label');
+      const label = document.createElement('p');
+      label.className = 'option-label';
       label.textContent = labelText;
-      label.htmlFor = `row-${rowIndex}-option-${optionIndex}`;
 
-      const select = createSelect(rowIndex, optionIndex);
-      select.id = label.htmlFor;
-      select.value = answers[rowIndex][optionIndex];
+      const rankGroup = document.createElement('div');
+      rankGroup.className = 'rank-group';
 
-      optionCard.append(label, select);
+      [1, 2, 3, 4].forEach((rank) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'rank-btn';
+        btn.textContent = String(rank);
+        btn.dataset.rowIndex = String(rowIndex);
+        btn.dataset.optionIndex = String(optionIndex);
+        btn.dataset.rank = String(rank);
+        rankGroup.append(btn);
+      });
+
+      optionCard.append(label, rankGroup);
       optionGrid.append(optionCard);
     });
 
     card.append(top, optionGrid);
     questionList.append(card);
+
+    updateRankButtons(rowIndex);
   });
 
-  syncSelectAvailability();
   updateProgress();
-}
-
-function syncSelectAvailability() {
-  const selects = questionList.querySelectorAll('select');
-
-  selects.forEach((select) => {
-    const rowIndex = Number(select.dataset.rowIndex);
-    const optionIndex = Number(select.dataset.optionIndex);
-    const rowAnswers = answers[rowIndex];
-
-    Array.from(select.options).forEach((option) => {
-      if (!option.value) {
-        option.disabled = false;
-        return;
-      }
-
-      const isUsedElsewhere = rowAnswers.some(
-        (answer, answerIndex) => answer === option.value && answerIndex !== optionIndex,
-      );
-      option.disabled = isUsedElsewhere;
-    });
-  });
 }
 
 function updateProgress() {
   const completedRows = answers.filter((row) => row.every(Boolean)).length;
   progressText.textContent = `${completedRows} of ${assessmentRows.length} rows complete`;
+  progressBarFill.style.width = `${(completedRows / assessmentRows.length) * 100}%`;
 }
 
-function setAnswer(rowIndex, optionIndex, value) {
-  answers[rowIndex][optionIndex] = value;
-  syncSelectAvailability();
+function setAnswer(rowIndex, optionIndex, rank) {
+  // If another option in the row already has this rank, clear it
+  answers[rowIndex].forEach((answer, i) => {
+    if (answer === rank && i !== optionIndex) {
+      answers[rowIndex][i] = '';
+    }
+  });
+
+  // Toggle: clicking the same rank again deselects it
+  answers[rowIndex][optionIndex] = answers[rowIndex][optionIndex] === rank ? '' : rank;
+
+  updateRankButtons(rowIndex);
   updateProgress();
 
   if (formError.textContent) {
@@ -346,65 +352,124 @@ function createSvgNode(tagName, attributes = {}, textContent = '') {
   return node;
 }
 
-function renderAxisChart(styleResult) {
-  const size = 320;
-  const center = size / 2;
-  const plotRadius = 118;
-  const scale = plotRadius / AXIS_LIMIT;
-  const pointX = Math.max(42, Math.min(278, center + styleResult.horizontal * scale));
-  const pointY = Math.max(42, Math.min(278, center - styleResult.vertical * scale));
-  const labelX = Math.min(pointX + 14, 280);
-  const labelY = Math.max(pointY - 12, 24);
-  const elements = [
-    createSvgNode('title', { id: 'axis-chart-title' }, 'Learning style graph'),
-    createSvgNode(
-      'desc',
-      { id: 'axis-chart-desc' },
-      'A two-axis graph showing your position between concrete and abstract learning, and between reflective and active learning.',
-    ),
-    createSvgNode('rect', { x: 0, y: 0, width: 320, height: 320, rx: 24, fill: '#f8fbff' }),
-    createSvgNode('text', { x: 160, y: 24, 'text-anchor': 'middle', 'font-size': 12, fill: '#4f5d75' }, 'AE'),
-    createSvgNode('text', { x: 160, y: 308, 'text-anchor': 'middle', 'font-size': 12, fill: '#4f5d75' }, 'RO'),
-    createSvgNode('text', { x: 24, y: 164, 'text-anchor': 'middle', 'font-size': 12, fill: '#4f5d75' }, 'CE'),
-    createSvgNode('text', { x: 296, y: 164, 'text-anchor': 'middle', 'font-size': 12, fill: '#4f5d75' }, 'AC'),
-    createSvgNode('text', { x: 84, y: 72, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#4f5d75' }, 'Accommodating'),
-    createSvgNode('text', { x: 236, y: 72, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#4f5d75' }, 'Converging'),
-    createSvgNode('text', { x: 84, y: 250, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#4f5d75' }, 'Diverging'),
-    createSvgNode('text', { x: 236, y: 250, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#4f5d75' }, 'Assimilating'),
-    createSvgNode('line', { x1: 160, y1: 34, x2: 160, y2: 286, stroke: '#90a4c4', 'stroke-width': 2 }),
-    createSvgNode('line', { x1: 34, y1: 160, x2: 286, y2: 160, stroke: '#90a4c4', 'stroke-width': 2 }),
-    createSvgNode('rect', { x: 42, y: 42, width: 236, height: 236, rx: 18, fill: 'none', stroke: '#d8e3f2', 'stroke-width': 2, 'stroke-dasharray': '6 8' }),
-    createSvgNode('circle', { cx: pointX, cy: pointY, r: 16, fill: 'rgba(37, 99, 235, 0.16)' }),
-    createSvgNode('circle', { cx: pointX, cy: pointY, r: 8, fill: '#2563eb' }),
-    createSvgNode('text', { x: labelX, y: labelY, 'font-size': 12, 'font-weight': 700, fill: '#14213d' }, 'You'),
-  ];
+function renderAxisChart(scores) {
+  const size = 360;
+  const center = 180;
+  const axisLen = 120;
+  const plotMax = 105;
+  const els = [];
 
-  axisChart.replaceChildren(...elements);
+  // Background
+  els.push(createSvgNode('rect', { x: 0, y: 0, width: size, height: size, rx: 24, fill: '#f8fbff' }));
+
+  // Reference circles (correspond to scores 9, 18, 27, 36)
+  [0.25, 0.5, 0.75, 1.0].forEach((fraction) => {
+    els.push(
+      createSvgNode('circle', {
+        cx: center,
+        cy: center,
+        r: plotMax * fraction,
+        fill: 'none',
+        stroke: fraction === 1 ? '#c4d4ec' : '#dce8f8',
+        'stroke-width': fraction === 1 ? 1.5 : 1,
+      }),
+    );
+  });
+
+  // Scale labels on the vertical (AE) axis
+  [9, 18, 27, 36].forEach((scaleVal) => {
+    const y = center - (scaleVal / MAX_SCORE) * plotMax;
+    els.push(
+      createSvgNode(
+        'text',
+        { x: center + 7, y: y + 4, 'font-size': 9, fill: '#94a3b8', 'font-family': 'Inter,system-ui,sans-serif' },
+        String(scaleVal),
+      ),
+    );
+  });
+
+  // Axis lines
+  els.push(
+    createSvgNode('line', { x1: center, y1: center - axisLen, x2: center, y2: center + axisLen, stroke: '#b0c4de', 'stroke-width': 1.5 }),
+  );
+  els.push(
+    createSvgNode('line', { x1: center - axisLen, y1: center, x2: center + axisLen, y2: center, stroke: '#b0c4de', 'stroke-width': 1.5 }),
+  );
+
+  // Score points (normalized to plotMax)
+  const norm = (score) => (score / MAX_SCORE) * plotMax;
+  const pts = {
+    AE: [center, center - norm(scores.AE)],
+    AC: [center + norm(scores.AC), center],
+    RO: [center, center + norm(scores.RO)],
+    CE: [center - norm(scores.CE), center],
+  };
+
+  // Diamond polygon
+  const polyPts = Object.values(pts)
+    .map(([x, y]) => `${x},${y}`)
+    .join(' ');
+  els.push(
+    createSvgNode('polygon', {
+      points: polyPts,
+      fill: 'rgba(37,99,235,0.12)',
+      stroke: '#2563eb',
+      'stroke-width': 2.5,
+      'stroke-linejoin': 'round',
+    }),
+  );
+
+  // Vertex dots
+  Object.values(pts).forEach(([x, y]) => {
+    els.push(createSvgNode('circle', { cx: x, cy: y, r: 5.5, fill: '#2563eb' }));
+  });
+
+  // Axis labels and score values
+  const labelGap = 16;
+  const fontFamily = 'Inter,system-ui,sans-serif';
+
+  // AE – top
+  els.push(createSvgNode('text', { x: center, y: center - axisLen - labelGap, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#1e3a5f', 'font-family': fontFamily }, 'AE'));
+  els.push(createSvgNode('text', { x: center, y: center - axisLen - labelGap + 15, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#2563eb', 'font-family': fontFamily }, String(scores.AE)));
+
+  // AC – right
+  els.push(createSvgNode('text', { x: center + axisLen + labelGap, y: center - 4, 'text-anchor': 'start', 'font-size': 13, 'font-weight': 700, fill: '#1e3a5f', 'font-family': fontFamily }, 'AC'));
+  els.push(createSvgNode('text', { x: center + axisLen + labelGap, y: center + 12, 'text-anchor': 'start', 'font-size': 12, 'font-weight': 700, fill: '#2563eb', 'font-family': fontFamily }, String(scores.AC)));
+
+  // RO – bottom
+  els.push(createSvgNode('text', { x: center, y: center + axisLen + labelGap + 13, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#1e3a5f', 'font-family': fontFamily }, 'RO'));
+  els.push(createSvgNode('text', { x: center, y: center + axisLen + labelGap + 28, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, fill: '#2563eb', 'font-family': fontFamily }, String(scores.RO)));
+
+  // CE – left
+  els.push(createSvgNode('text', { x: center - axisLen - labelGap, y: center - 4, 'text-anchor': 'end', 'font-size': 13, 'font-weight': 700, fill: '#1e3a5f', 'font-family': fontFamily }, 'CE'));
+  els.push(createSvgNode('text', { x: center - axisLen - labelGap, y: center + 12, 'text-anchor': 'end', 'font-size': 12, 'font-weight': 700, fill: '#2563eb', 'font-family': fontFamily }, String(scores.CE)));
+
+  axisChart.replaceChildren(...els);
 }
 
 function renderResults(scores, styleResult) {
   renderScoreCards(scores);
   renderBarChart(scores);
-  renderAxisChart(styleResult);
+  renderAxisChart(scores);
 
   const style = styleMeta[styleResult.name];
   styleName.textContent = styleResult.name;
   styleCombo.textContent = style.combination;
   styleDescription.textContent = style.description;
-  axisSummary.textContent = `AC − CE = ${styleResult.horizontal}, AE − RO = ${styleResult.vertical}`;
+  axisSummary.textContent = `CE ${scores.CE} · RO ${scores.RO} · AC ${scores.AC} · AE ${scores.AE}`;
+  axisDesc.textContent = `Orientation: AC − CE = ${styleResult.horizontal}, AE − RO = ${styleResult.vertical}`;
 
   resultsSection.classList.remove('hidden');
   resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-questionList.addEventListener('change', (event) => {
-  if (!(event.target instanceof HTMLSelectElement)) {
-    return;
-  }
+questionList.addEventListener('click', (event) => {
+  const btn = event.target.closest('.rank-btn');
+  if (!btn) return;
 
-  const rowIndex = Number(event.target.dataset.rowIndex);
-  const optionIndex = Number(event.target.dataset.optionIndex);
-  setAnswer(rowIndex, optionIndex, event.target.value);
+  const rowIndex = Number(btn.dataset.rowIndex);
+  const optionIndex = Number(btn.dataset.optionIndex);
+  setAnswer(rowIndex, optionIndex, btn.dataset.rank);
 });
 
 form.addEventListener('submit', (event) => {
