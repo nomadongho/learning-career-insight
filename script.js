@@ -486,7 +486,7 @@ function sendResultByEmail() {
 
   const recipient = emailRecipientInput.value.trim();
   if (!isValidEmailAddress(recipient)) {
-    formError.textContent = 'Please enter a valid email address before sending.';
+    formError.textContent = 'Please enter a valid email address or leave it empty.';
     return;
   }
 
