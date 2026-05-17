@@ -120,6 +120,12 @@ h3 {
   font-size: 1.05rem;
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .hero-card ul {
   margin-bottom: 16px;
   padding-left: 20px;
@@ -473,6 +479,12 @@ button:not(.rank-btn):not(.word-hint):active {
 
 .result-history-card {
   margin-top: 18px;
+}
+
+.history-page {
+  width: min(1160px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 48px 0 88px;
 }
 
 .summary-meta {
