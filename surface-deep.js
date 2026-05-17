@@ -125,6 +125,8 @@ function renderQuestions() {
     SCALE_OPTIONS.forEach((option) => {
       const optionCard = document.createElement('div');
       optionCard.className = 'option-card';
+      optionCard.dataset.questionIndex = String(index);
+      optionCard.dataset.answerKey = option.key;
 
       const label = document.createElement('p');
       label.className = 'option-label';
@@ -348,9 +350,9 @@ function sendResultByEmail() {
 }
 
 questionList.addEventListener('click', (event) => {
-  const button = event.target.closest('.rank-btn');
-  if (!button) return;
-  setAnswer(Number(button.dataset.questionIndex), button.dataset.answerKey);
+  const optionCard = event.target.closest('.option-card[data-question-index][data-answer-key]');
+  if (!optionCard || !questionList.contains(optionCard)) return;
+  setAnswer(Number(optionCard.dataset.questionIndex), optionCard.dataset.answerKey);
 });
 
 form.addEventListener('submit', (event) => {

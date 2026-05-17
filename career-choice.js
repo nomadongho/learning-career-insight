@@ -134,6 +134,8 @@ function renderQuestions() {
     CAREER_SCALE_OPTIONS.forEach((option) => {
       const optionCard = document.createElement('div');
       optionCard.className = 'option-card';
+      optionCard.dataset.itemId = item.id;
+      optionCard.dataset.answerValue = String(option.value);
 
       const label = document.createElement('p');
       label.className = 'option-label';
@@ -370,9 +372,9 @@ function sendResultByEmail() {
 }
 
 questionList.addEventListener('click', (event) => {
-  const button = event.target.closest('.rank-btn');
-  if (!button) return;
-  setAnswer(button.dataset.itemId, Number(button.dataset.answerValue));
+  const optionCard = event.target.closest('.option-card[data-item-id][data-answer-value]');
+  if (!optionCard || !questionList.contains(optionCard)) return;
+  setAnswer(optionCard.dataset.itemId, Number(optionCard.dataset.answerValue));
 });
 
 form.addEventListener('submit', (event) => {
