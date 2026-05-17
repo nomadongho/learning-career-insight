@@ -939,9 +939,6 @@ button:focus,
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .option-grid-scale {
-    grid-template-columns: repeat(5, minmax(92px, 1fr));
-  }
 }
 
 @media (max-width: 640px) {
@@ -972,6 +969,31 @@ button:focus,
 
   .bar-chart-dual {
     grid-template-columns: 1fr;
+  }
+
+  .option-grid-scale {
+    grid-template-columns: 1fr;
+  }
+
+  .option-grid-scale .option-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: unset;
+    padding: 12px 14px;
+    gap: 12px;
+    text-align: left;
+  }
+
+  .option-grid-scale .option-label {
+    justify-content: flex-start;
+    min-height: unset;
+    flex: 1;
+  }
+
+  .option-grid-scale .rank-btn {
+    margin: 0;
+    flex-shrink: 0;
   }
 
   .section-heading {
@@ -1013,10 +1035,6 @@ button:focus,
 @media (max-width: 440px) {
   .option-grid {
     grid-template-columns: 1fr;
-  }
-
-  .option-grid-scale {
-    grid-template-columns: repeat(5, minmax(64px, 1fr));
   }
 
   .rank-btn {
