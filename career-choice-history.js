@@ -26,7 +26,7 @@ function renderSavedResultHistory(items) {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${resultItem.career} | ${resultItem.dominantFactor}`;
+    title.textContent = `${resultItem.career} | ${store.dominantFactorLabels[resultItem.dominantFactorKey] ?? store.dominantFactorLabels.balanced}`;
 
     const meta = document.createElement('p');
     meta.className = 'history-meta';

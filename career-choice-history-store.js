@@ -1,6 +1,12 @@
 (function initCareerChoiceResultHistoryStore() {
   const storageKey = 'careerChoiceResultHistory.v1';
   const limit = 30;
+  const dominantFactorLabels = {
+    people: 'People around you',
+    guidance: 'Teachers/counselor input',
+    media: 'External material/media',
+    balanced: 'Balanced influences',
+  };
 
   function toDate(value) {
     if (value instanceof Date) return value;
@@ -10,7 +16,7 @@
 
   function normalize(rawResult) {
     if (!rawResult || typeof rawResult !== 'object') return null;
-    const { id, career, ratings, factorScores, dominantFactor, testedAt } = rawResult;
+    const { id, career, ratings, factorScores, dominantFactorKey, dominantFactor, testedAt } = rawResult;
     const testedAtDate = toDate(testedAt);
     const hasRatings =
       ratings &&
@@ -27,13 +33,20 @@
       typeof factorScores.guidance === 'number' &&
       typeof factorScores.media === 'number';
 
+    const legacyDominantFactorKey =
+      typeof dominantFactor === 'string'
+        ? Object.entries(dominantFactorLabels).find(([, label]) => label === dominantFactor)?.[0]
+        : '';
+    const normalizedDominantFactorKey = dominantFactorKey || legacyDominantFactorKey;
+
     if (
       !id ||
       typeof career !== 'string' ||
       !career.trim() ||
       !hasRatings ||
       !hasFactorScores ||
-      typeof dominantFactor !== 'string' ||
+      typeof normalizedDominantFactorKey !== 'string' ||
+      !dominantFactorLabels[normalizedDominantFactorKey] ||
       Number.isNaN(testedAtDate.getTime())
     ) {
       return null;
@@ -56,7 +69,7 @@
         guidance: factorScores.guidance,
         media: factorScores.media,
       },
-      dominantFactor,
+      dominantFactorKey: normalizedDominantFactorKey,
       testedAt: testedAtDate.toISOString(),
     };
   }
@@ -91,5 +104,6 @@
     load,
     persist,
     formatScoreSummary,
+    dominantFactorLabels,
   };
 })();

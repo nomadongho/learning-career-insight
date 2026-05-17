@@ -20,6 +20,7 @@ const FACTOR_LABELS = {
   people: 'People around you',
   guidance: 'Teachers/counselor input',
   media: 'External material/media',
+  balanced: 'Balanced influences',
 };
 
 const FACTOR_DESCRIPTIONS = {
@@ -209,7 +210,7 @@ function determineDominantFactor(factorScores) {
 function createResultSnapshot(career, factorScores, dominantFactor, testedAt) {
   const testedAtIso = store.toDate(testedAt).toISOString();
   snapshotCounter += 1;
-  const fallbackId = `${Date.now()}-${snapshotCounter}-${Math.random().toString(16).slice(2, 10).padEnd(8, '0')}`;
+  const fallbackId = `${Date.now()}-${snapshotCounter}-${Math.random().toString(16).slice(2, 10)}`;
   const snapshotId =
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : fallbackId;
   return {
@@ -217,7 +218,7 @@ function createResultSnapshot(career, factorScores, dominantFactor, testedAt) {
     career,
     ratings: { ...answers },
     factorScores: { ...factorScores },
-    dominantFactor,
+    dominantFactorKey: dominantFactor.key,
     testedAt: testedAtIso,
   };
 }
@@ -225,7 +226,8 @@ function createResultSnapshot(career, factorScores, dominantFactor, testedAt) {
 function renderBarChart(factorScores) {
   barChart.innerHTML = '';
 
-  Object.entries(FACTOR_LABELS).forEach(([key, labelText]) => {
+  ['people', 'guidance', 'media'].forEach((key) => {
+    const labelText = FACTOR_LABELS[key];
     const value = factorScores[key];
 
     const group = document.createElement('div');
@@ -276,7 +278,7 @@ function renderSavedHistory() {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${itemData.career} | ${itemData.dominantFactor}`;
+    title.textContent = `${itemData.career} | ${FACTOR_LABELS[itemData.dominantFactorKey] ?? FACTOR_LABELS.balanced}`;
 
     const meta = document.createElement('p');
     meta.className = 'history-meta';
@@ -304,16 +306,15 @@ function loadResultById(resultId) {
   const savedResult = savedHistory.find((item) => item.id === resultId);
   if (!savedResult) return;
   latestResultSnapshot = { ...savedResult };
+  const dominantFactorKey = savedResult.dominantFactorKey || 'balanced';
   renderResult(
     {
       career: savedResult.career,
       factorScores: savedResult.factorScores,
       dominantFactor: {
-        title: savedResult.dominantFactor,
-        description:
-          FACTOR_DESCRIPTIONS[
-            Object.entries(FACTOR_LABELS).find(([, title]) => title === savedResult.dominantFactor)?.[0] ?? 'balanced'
-          ],
+        key: dominantFactorKey,
+        title: FACTOR_LABELS[dominantFactorKey] ?? FACTOR_LABELS.balanced,
+        description: FACTOR_DESCRIPTIONS[dominantFactorKey] ?? FACTOR_DESCRIPTIONS.balanced,
       },
     },
     savedResult.testedAt,
@@ -327,12 +328,13 @@ function isValidOrEmptyEmailAddress(value) {
 }
 
 function buildEmailBody(resultData) {
+  const dominantFactorTitle = FACTOR_LABELS[resultData.dominantFactorKey] ?? FACTOR_LABELS.balanced;
   return [
     '3 Factors of Career Choice Result',
     '',
     `Intended career: ${resultData.career}`,
     `Tested at: ${formatTestedAt(resultData.testedAt)}`,
-    `Dominant factor: ${resultData.dominantFactor}`,
+    `Dominant factor: ${dominantFactorTitle}`,
     '',
     `People around you: ${resultData.factorScores.people.toFixed(1)} / 5`,
     `Teachers/counselor input: ${resultData.factorScores.guidance.toFixed(1)} / 5`,
@@ -379,7 +381,7 @@ form.addEventListener('submit', (event) => {
     dominantFactor,
   };
 
-  latestResultSnapshot = createResultSnapshot(career, factorScores, dominantFactor.title, new Date());
+  latestResultSnapshot = createResultSnapshot(career, factorScores, dominantFactor, new Date());
   appendResultToHistory(latestResultSnapshot);
   renderResult(resultValues, latestResultSnapshot.testedAt);
   formError.textContent = '';
