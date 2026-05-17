@@ -94,6 +94,7 @@ const styleMeta = {
 
 const MAX_SCORE = assessmentRows.length * 4;
 const AXIS_LIMIT = assessmentRows.length * 3;
+const SVG_NS = 'http://www.w3.org/2000/svg';
 const answers = assessmentRows.map(() => Array(4).fill(''));
 
 const questionList = document.querySelector('#question-list');
@@ -318,7 +319,12 @@ function renderBarChart(scores) {
     fill.setAttribute('aria-hidden', 'true');
 
     const label = document.createElement('p');
-    label.innerHTML = `<strong>${dimension.key}</strong><br>${dimension.name}`;
+    const shortName = document.createElement('strong');
+    shortName.textContent = dimension.key;
+    const lineBreak = document.createElement('br');
+    const fullName = document.createTextNode(dimension.name);
+
+    label.append(shortName, lineBreak, fullName);
 
     track.append(fill);
     group.append(value, track, label);
@@ -326,33 +332,54 @@ function renderBarChart(scores) {
   });
 }
 
+function createSvgNode(tagName, attributes = {}, textContent = '') {
+  const node = document.createElementNS(SVG_NS, tagName);
+
+  Object.entries(attributes).forEach(([name, value]) => {
+    node.setAttribute(name, String(value));
+  });
+
+  if (textContent) {
+    node.textContent = textContent;
+  }
+
+  return node;
+}
+
 function renderAxisChart(styleResult) {
   const size = 320;
   const center = size / 2;
   const plotRadius = 118;
   const scale = plotRadius / AXIS_LIMIT;
-  const pointX = center + styleResult.horizontal * scale;
-  const pointY = center - styleResult.vertical * scale;
+  const pointX = Math.max(42, Math.min(278, center + styleResult.horizontal * scale));
+  const pointY = Math.max(42, Math.min(278, center - styleResult.vertical * scale));
+  const labelX = Math.min(pointX + 14, 280);
+  const labelY = Math.max(pointY - 12, 24);
+  const elements = [
+    createSvgNode('title', { id: 'axis-chart-title' }, 'Learning style graph'),
+    createSvgNode(
+      'desc',
+      { id: 'axis-chart-desc' },
+      'A two-axis graph showing your position between concrete and abstract learning, and between reflective and active learning.',
+    ),
+    createSvgNode('rect', { x: 0, y: 0, width: 320, height: 320, rx: 24, fill: '#f8fbff' }),
+    createSvgNode('text', { x: 160, y: 24, 'text-anchor': 'middle', 'font-size': 12, fill: '#4f5d75' }, 'AE'),
+    createSvgNode('text', { x: 160, y: 308, 'text-anchor': 'middle', 'font-size': 12, fill: '#4f5d75' }, 'RO'),
+    createSvgNode('text', { x: 24, y: 164, 'text-anchor': 'middle', 'font-size': 12, fill: '#4f5d75' }, 'CE'),
+    createSvgNode('text', { x: 296, y: 164, 'text-anchor': 'middle', 'font-size': 12, fill: '#4f5d75' }, 'AC'),
+    createSvgNode('text', { x: 84, y: 72, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#4f5d75' }, 'Accommodating'),
+    createSvgNode('text', { x: 236, y: 72, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#4f5d75' }, 'Converging'),
+    createSvgNode('text', { x: 84, y: 250, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#4f5d75' }, 'Diverging'),
+    createSvgNode('text', { x: 236, y: 250, 'text-anchor': 'middle', 'font-size': 13, 'font-weight': 700, fill: '#4f5d75' }, 'Assimilating'),
+    createSvgNode('line', { x1: 160, y1: 34, x2: 160, y2: 286, stroke: '#90a4c4', 'stroke-width': 2 }),
+    createSvgNode('line', { x1: 34, y1: 160, x2: 286, y2: 160, stroke: '#90a4c4', 'stroke-width': 2 }),
+    createSvgNode('rect', { x: 42, y: 42, width: 236, height: 236, rx: 18, fill: 'none', stroke: '#d8e3f2', 'stroke-width': 2, 'stroke-dasharray': '6 8' }),
+    createSvgNode('circle', { cx: pointX, cy: pointY, r: 16, fill: 'rgba(37, 99, 235, 0.16)' }),
+    createSvgNode('circle', { cx: pointX, cy: pointY, r: 8, fill: '#2563eb' }),
+    createSvgNode('text', { x: labelX, y: labelY, 'font-size': 12, 'font-weight': 700, fill: '#14213d' }, 'You'),
+  ];
 
-  axisChart.innerHTML = `
-    <title id="axis-chart-title">Learning style graph</title>
-    <desc id="axis-chart-desc">A two-axis graph showing your position between concrete and abstract learning, and between reflective and active learning.</desc>
-    <rect x="0" y="0" width="320" height="320" rx="24" fill="#f8fbff"></rect>
-    <text x="160" y="24" text-anchor="middle" font-size="12" fill="#4f5d75">AE</text>
-    <text x="160" y="308" text-anchor="middle" font-size="12" fill="#4f5d75">RO</text>
-    <text x="24" y="164" text-anchor="middle" font-size="12" fill="#4f5d75">CE</text>
-    <text x="296" y="164" text-anchor="middle" font-size="12" fill="#4f5d75">AC</text>
-    <text x="84" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#4f5d75">Accommodating</text>
-    <text x="236" y="72" text-anchor="middle" font-size="13" font-weight="700" fill="#4f5d75">Converging</text>
-    <text x="84" y="250" text-anchor="middle" font-size="13" font-weight="700" fill="#4f5d75">Diverging</text>
-    <text x="236" y="250" text-anchor="middle" font-size="13" font-weight="700" fill="#4f5d75">Assimilating</text>
-    <line x1="160" y1="34" x2="160" y2="286" stroke="#90a4c4" stroke-width="2"></line>
-    <line x1="34" y1="160" x2="286" y2="160" stroke="#90a4c4" stroke-width="2"></line>
-    <rect x="42" y="42" width="236" height="236" rx="18" fill="none" stroke="#d8e3f2" stroke-width="2" stroke-dasharray="6 8"></rect>
-    <circle cx="${pointX}" cy="${pointY}" r="16" fill="rgba(37, 99, 235, 0.16)"></circle>
-    <circle cx="${pointX}" cy="${pointY}" r="8" fill="#2563eb"></circle>
-    <text x="${Math.min(pointX + 14, 280)}" y="${Math.max(pointY - 12, 24)}" font-size="12" font-weight="700" fill="#14213d">You</text>
-  `;
+  axisChart.replaceChildren(...elements);
 }
 
 function renderResults(scores, styleResult) {

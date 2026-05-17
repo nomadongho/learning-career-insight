@@ -25,7 +25,7 @@ body {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
   background:
-    radial-gradient(circle at top, #ffffff 0%, #eef4ff 42%, #e3ecff 100%);
+    radial-gradient(circle at top, #ffffff 0%, #eef4ff 40%, #e3ecff 100%);
   color: var(--text);
   line-height: 1.6;
 }
