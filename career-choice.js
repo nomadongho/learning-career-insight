@@ -438,6 +438,16 @@ function loadResultById(resultId) {
   const savedResult = savedHistory.find((item) => item.id === resultId);
   if (!savedResult) return;
   latestResultSnapshot = { ...savedResult };
+  if (savedResult.ratings && typeof savedResult.ratings === 'object') {
+    careerChoiceItems.forEach((item) => {
+      if (item.id in savedResult.ratings) {
+        answers[item.id] = savedResult.ratings[item.id];
+      }
+    });
+  }
+  if (nicknameInput) nicknameInput.value = savedResult.nickname || '';
+  if (careerIntentInput) careerIntentInput.value = savedResult.career || '';
+  renderQuestions();
   const dominantConstructKey = savedResult.dominantFactorKey || 'balanced';
   renderResult(
     {

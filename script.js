@@ -543,6 +543,15 @@ function loadSavedResultById(resultId) {
     styleResult: { ...savedResult.styleResult },
     testedAt: savedResult.testedAt,
   };
+  if (Array.isArray(savedResult.selections)) {
+    savedResult.selections.forEach((row, rowIndex) => {
+      if (Array.isArray(row)) {
+        answers[rowIndex] = [...row];
+      }
+    });
+  }
+  if (nicknameInput) nicknameInput.value = savedResult.nickname || '';
+  renderQuestions();
   renderResults(savedResult.scores, savedResult.styleResult, savedResult.testedAt);
 }
 
