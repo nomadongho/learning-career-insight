@@ -1,11 +1,25 @@
 const careerChoiceItems = [
-  { id: 'parents', label: 'Parents' },
-  { id: 'teachers', label: 'Teachers' },
-  { id: 'peersAndFriends', label: 'Peers and friends' },
-  { id: 'relativesAndFamilyFriends', label: 'Relatives and family friends' },
-  { id: 'careerGuidanceCounselor', label: 'Career guidance counselor' },
-  { id: 'visitingSpeakers', label: 'Visiting speakers' },
-  { id: 'promotionalMaterial', label: 'Promotional material' },
+  { id: 'longRangeEarningPotential', label: 'Good long-range earning potential' },
+  { id: 'costOfEducation', label: 'Cost of education' },
+  { id: 'jobSatisfaction', label: 'Job satisfaction' },
+  { id: 'senseOfCareer', label: 'Sense of career' },
+  { id: 'yearsOfFormalEducation', label: 'Years of formal education' },
+  { id: 'highInitialSalary', label: 'High initial salary' },
+  { id: 'intellectualChallenge', label: 'Intellectual challenge' },
+  { id: 'aptitudeForCareer', label: 'Aptitude for career (fit for subject)' },
+  { id: 'previousWorkExperience', label: 'Previous work experience' },
+  { id: 'availabilityOfEmployment', label: 'Availability of employment' },
+  { id: 'opportunitiesForPromotions', label: 'Opportunities for promotions' },
+  { id: 'adequateLeisureTime', label: 'Adequate leisure time' },
+  { id: 'opportunityToHelpOthers', label: 'Opportunity to help others' },
+  { id: 'opportunityToWorkWithPublic', label: 'Opportunity to work with the public' },
+  { id: 'beingPartOfTeam', label: 'Being part of a team' },
+  { id: 'opportunityToTravel', label: 'Opportunity to travel' },
+  { id: 'parentsOccupations', label: "Parents' occupations" },
+  { id: 'selfEmploymentOpportunities', label: 'Self employment opportunities' },
+  { id: 'jobSecurity', label: 'Job security' },
+  { id: 'varietyOfWork', label: 'Variety of work' },
+  { id: 'familyFriendlyWorkSchedule', label: 'Family friendly work schedule' },
 ];
 
 const CAREER_SCALE_OPTIONS = [
@@ -17,25 +31,50 @@ const CAREER_SCALE_OPTIONS = [
 ];
 
 const FACTOR_LABELS = {
-  people: 'People around you',
-  guidance: 'Teachers/counselor input',
-  media: 'External material/media',
+  personalFitAndRewards: 'Personal fit & rewards',
+  workConditionsAndStability: 'Work conditions & stability',
+  socialAndServiceOrientation: 'Social & service orientation',
   balanced: 'Balanced influences',
 };
 
 const FACTOR_DESCRIPTIONS = {
-  people:
-    'Your decision is currently influenced most by close people around you (family, relatives, and peers).',
-  guidance:
-    'Your decision is currently influenced most by school/professional guidance inputs (teachers, counselor, speakers).',
-  media: 'Your decision is currently influenced most by external materials such as talks and promotional resources.',
+  personalFitAndRewards:
+    'You currently prioritize personal fit and career rewards (interest, aptitude, and earning-related factors) most strongly.',
+  workConditionsAndStability:
+    'You currently prioritize day-to-day work conditions and long-term employment stability most strongly.',
+  socialAndServiceOrientation:
+    'You currently prioritize people-oriented and service-oriented aspects of careers most strongly.',
   balanced: 'Your factor scores are tied, so your current career decision appears balanced across multiple influences.',
 };
 
 const FACTOR_GROUPS = {
-  people: ['parents', 'peersAndFriends', 'relativesAndFamilyFriends'],
-  guidance: ['teachers', 'careerGuidanceCounselor', 'visitingSpeakers'],
-  media: ['promotionalMaterial'],
+  personalFitAndRewards: [
+    'longRangeEarningPotential',
+    'costOfEducation',
+    'jobSatisfaction',
+    'senseOfCareer',
+    'yearsOfFormalEducation',
+    'highInitialSalary',
+    'intellectualChallenge',
+    'aptitudeForCareer',
+  ],
+  workConditionsAndStability: [
+    'previousWorkExperience',
+    'availabilityOfEmployment',
+    'opportunitiesForPromotions',
+    'adequateLeisureTime',
+    'opportunityToTravel',
+    'selfEmploymentOpportunities',
+    'jobSecurity',
+    'varietyOfWork',
+    'familyFriendlyWorkSchedule',
+  ],
+  socialAndServiceOrientation: [
+    'opportunityToHelpOthers',
+    'opportunityToWorkWithPublic',
+    'beingPartOfTeam',
+    'parentsOccupations',
+  ],
 };
 
 const store = window.careerChoiceResultHistoryStore;
@@ -185,7 +224,7 @@ function validateAnswers() {
 }
 
 function calculateFactorScores() {
-  const factorScores = { people: 0, guidance: 0, media: 0 };
+  const factorScores = { personalFitAndRewards: 0, workConditionsAndStability: 0, socialAndServiceOrientation: 0 };
 
   Object.entries(FACTOR_GROUPS).forEach(([factorKey, itemIds]) => {
     const total = itemIds.reduce((sum, itemId) => sum + answers[itemId], 0);
@@ -235,7 +274,7 @@ function createResultSnapshot(career, factorScores, dominantFactor, testedAt) {
 function renderBarChart(factorScores) {
   barChart.innerHTML = '';
 
-  ['people', 'guidance', 'media'].forEach((key) => {
+  ['personalFitAndRewards', 'workConditionsAndStability', 'socialAndServiceOrientation'].forEach((key) => {
     const labelText = FACTOR_LABELS[key];
     const value = factorScores[key];
 
@@ -353,9 +392,9 @@ function buildEmailBody(resultData) {
     `Tested at: ${formatTestedAt(resultData.testedAt)}`,
     `Dominant factor: ${dominantFactorTitle}`,
     '',
-    `People around you: ${resultData.factorScores.people.toFixed(1)} / 5`,
-    `Teachers/counselor input: ${resultData.factorScores.guidance.toFixed(1)} / 5`,
-    `External material/media: ${resultData.factorScores.media.toFixed(1)} / 5`,
+    `Personal fit & rewards: ${resultData.factorScores.personalFitAndRewards.toFixed(1)} / 5`,
+    `Work conditions & stability: ${resultData.factorScores.workConditionsAndStability.toFixed(1)} / 5`,
+    `Social & service orientation: ${resultData.factorScores.socialAndServiceOrientation.toFixed(1)} / 5`,
   ].join('\n');
 }
 
