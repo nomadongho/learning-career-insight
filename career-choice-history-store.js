@@ -1,12 +1,12 @@
 (function initCareerChoiceResultHistoryStore() {
-  const storageKey = 'careerChoiceResultHistory.v2';
+  const storageKey = 'careerChoiceResultHistory.v3';
   const limit = 30;
   const dominantFactorLabels = {
-    personalFitAndRewards: 'Personal fit & rewards',
-    workConditionsAndStability: 'Work conditions & stability',
-    socialAndServiceOrientation: 'Social service & collaboration',
-    socialInfluence: 'Social influence sources',
-    balanced: 'Balanced influences',
+    extrinsic:     'Extrinsic',
+    intrinsic:     'Intrinsic',
+    interpersonal: 'Interpersonal',
+    other:         'Other',
+    balanced:      'Balanced influences',
   };
 
   const allItemIds = [
@@ -17,10 +17,15 @@
   ];
 
   const factorScoreKeys = [
-    'personalFitAndRewards',
-    'workConditionsAndStability',
-    'socialAndServiceOrientation',
-    'socialInfluence',
+    'prestigeFinancial',
+    'securityOfEmployment',
+    'workLifeBalance',
+    'selfFulfilment',
+    'goodCitizen',
+    'looseRelations',
+    'closeRelations',
+    'predisposition',
+    'travel',
   ];
 
   function toDate(value) {
@@ -93,10 +98,10 @@
 
   function formatScoreSummary(factorScores) {
     return [
-      `Personal ${factorScores.personalFitAndRewards.toFixed(1)}`,
-      `Practical ${factorScores.workConditionsAndStability.toFixed(1)}`,
-      `Social ${factorScores.socialAndServiceOrientation.toFixed(1)}`,
-      `Influence ${factorScores.socialInfluence.toFixed(1)}`,
+      `Prestige ${factorScores.prestigeFinancial.toFixed(2)}`,
+      `Security ${factorScores.securityOfEmployment.toFixed(2)}`,
+      `WLB ${factorScores.workLifeBalance.toFixed(2)}`,
+      `Fulfilment ${factorScores.selfFulfilment.toFixed(2)}`,
     ].join(' · ');
   }
 

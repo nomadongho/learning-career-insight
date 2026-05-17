@@ -1,5 +1,6 @@
 // Section 1 (v1–v26): How important are the following factors to you in choosing a career?
 // Section 2 (q1–q7):  How influential are the following to you in choosing a career?
+// Factor/construct grouping based on the career-choice structural model.
 const careerChoiceItems = [
   { id: 'v1',  label: 'Status of career',                          scale: 'importance' },
   { id: 'v2',  label: 'Good long-range earnings potential',         scale: 'importance' },
@@ -52,39 +53,32 @@ const INFLUENCE_SCALE_OPTIONS = [
   { value: 1, text: 'Very uninfluential' },
 ];
 
-const FACTOR_LABELS = {
-  personalFitAndRewards: 'Personal fit & rewards',
-  workConditionsAndStability: 'Work conditions & stability',
-  socialAndServiceOrientation: 'Social service & collaboration',
-  socialInfluence: 'Social influence sources',
-  balanced: 'Balanced influences',
+// Nine factors organised into four constructs (structural model).
+const FACTORS = {
+  prestigeFinancial:    { label: 'Prestige & financial',   items: ['v1','v2','v3','v4','v5'] },
+  securityOfEmployment: { label: 'Security of employment', items: ['v6','v9','v10','v11','v15','v16','v17'] },
+  workLifeBalance:      { label: 'Work-life balance',      items: ['v7','v8'] },
+  selfFulfilment:       { label: 'Self-fulfilment',        items: ['v18','v19','v20','v21'] },
+  goodCitizen:          { label: 'Good citizen',           items: ['v12','v13','v14'] },
+  looseRelations:       { label: 'Loose relations',        items: ['q5','q6','q7'] },
+  closeRelations:       { label: 'Close relations',        items: ['q1','q2','q3','q4'] },
+  predisposition:       { label: 'Predisposition',         items: ['v22','v23','v24','v25'] },
+  travel:               { label: 'Travel',                 items: ['v26'] },
 };
 
-const FACTOR_DESCRIPTIONS = {
-  personalFitAndRewards:
-    'Your responses emphasize personal status, earnings, intellectual challenge, and career fit.',
-  workConditionsAndStability:
-    'Your responses emphasize practical conditions, job security, and long-term stability.',
-  socialAndServiceOrientation:
-    'Your responses emphasize collaboration and helping/working with other people.',
-  socialInfluence:
-    'Your responses show strong influence from people and external sources around you.',
-  balanced: 'Your factor scores are tied, so your current career decision appears balanced across multiple influences.',
+const CONSTRUCTS = {
+  extrinsic:     { label: 'Extrinsic',      factors: ['prestigeFinancial','securityOfEmployment','workLifeBalance'] },
+  intrinsic:     { label: 'Intrinsic',      factors: ['selfFulfilment','goodCitizen'] },
+  interpersonal: { label: 'Interpersonal',  factors: ['looseRelations','closeRelations'] },
+  other:         { label: 'Other',          factors: ['predisposition','travel'] },
 };
 
-const FACTOR_GROUPS = {
-  personalFitAndRewards: [
-    'v1', 'v2', 'v3', 'v4', 'v18', 'v19', 'v20', 'v21', 'v22', 'v25',
-  ],
-  workConditionsAndStability: [
-    'v5', 'v6', 'v7', 'v8', 'v9', 'v10', 'v11', 'v15', 'v16', 'v17', 'v23', 'v24', 'v26',
-  ],
-  socialAndServiceOrientation: [
-    'v12', 'v13', 'v14',
-  ],
-  socialInfluence: [
-    'q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7',
-  ],
+const CONSTRUCT_DESCRIPTIONS = {
+  extrinsic:     'Your responses emphasize external rewards, employment security, and work-life conditions.',
+  intrinsic:     'Your responses emphasize personal fulfilment and contributing to society.',
+  interpersonal: 'Your responses are most shaped by the people around you — both close ties and wider social circles.',
+  other:         'Your responses are most shaped by personal background and lifestyle preferences.',
+  balanced:      'Your construct scores are tied, suggesting a balanced range of career influences.',
 };
 
 const store = window.careerChoiceResultHistoryStore;
@@ -253,42 +247,35 @@ function validateAnswers() {
 }
 
 function calculateFactorScores() {
-  const factorScores = {
-    personalFitAndRewards: 0,
-    workConditionsAndStability: 0,
-    socialAndServiceOrientation: 0,
-    socialInfluence: 0,
-  };
-
-  Object.entries(FACTOR_GROUPS).forEach(([factorKey, itemIds]) => {
-    const total = itemIds.reduce((sum, itemId) => sum + answers[itemId], 0);
-    factorScores[factorKey] = total / itemIds.length;
+  const factorScores = {};
+  Object.entries(FACTORS).forEach(([key, factor]) => {
+    const total = factor.items.reduce((sum, id) => sum + answers[id], 0);
+    factorScores[key] = total / factor.items.length;
   });
-
   return factorScores;
 }
 
-function determineDominantFactor(factorScores) {
-  const entries = Object.entries(factorScores);
-  const maxScore = Math.max(...entries.map(([, value]) => value));
-  const winners = entries.filter(([, value]) => value === maxScore);
-  if (winners.length !== 1) {
-    return {
-      key: 'balanced',
-      title: 'Balanced influences',
-      description: FACTOR_DESCRIPTIONS.balanced,
-    };
-  }
-
-  const [factorKey] = winners[0];
-  return {
-    key: factorKey,
-    title: FACTOR_LABELS[factorKey],
-    description: FACTOR_DESCRIPTIONS[factorKey],
-  };
+function calculateConstructScores(factorScores) {
+  const constructScores = {};
+  Object.entries(CONSTRUCTS).forEach(([key, construct]) => {
+    const total = construct.factors.reduce((sum, fKey) => sum + factorScores[fKey], 0);
+    constructScores[key] = total / construct.factors.length;
+  });
+  return constructScores;
 }
 
-function createResultSnapshot(career, factorScores, dominantFactor, testedAt) {
+function determineDominantConstruct(constructScores) {
+  const entries = Object.entries(constructScores);
+  const maxScore = Math.max(...entries.map(([, v]) => v));
+  const winners = entries.filter(([, v]) => v === maxScore);
+  if (winners.length !== 1) {
+    return { key: 'balanced', title: 'Balanced influences', description: CONSTRUCT_DESCRIPTIONS.balanced };
+  }
+  const [key] = winners[0];
+  return { key, title: CONSTRUCTS[key].label, description: CONSTRUCT_DESCRIPTIONS[key] };
+}
+
+function createResultSnapshot(career, factorScores, dominantConstruct, testedAt) {
   const testedAtIso = store.toDate(testedAt).toISOString();
   snapshotCounter += 1;
   const fallbackId = `${Date.now()}-${snapshotCounter}-${Math.random().toString(16).slice(2, 10)}`;
@@ -300,24 +287,24 @@ function createResultSnapshot(career, factorScores, dominantFactor, testedAt) {
     career,
     ratings: { ...answers },
     factorScores: { ...factorScores },
-    dominantFactorKey: dominantFactor.key,
+    dominantFactorKey: dominantConstruct.key,
     testedAt: testedAtIso,
   };
 }
 
-function renderBarChart(factorScores) {
+function renderBarChart(constructScores) {
   barChart.innerHTML = '';
 
-  Object.keys(FACTOR_GROUPS).forEach((key) => {
-    const labelText = FACTOR_LABELS[key];
-    const value = factorScores[key];
+  Object.keys(CONSTRUCTS).forEach((key) => {
+    const labelText = CONSTRUCTS[key].label;
+    const value = constructScores[key];
 
     const group = document.createElement('div');
     group.className = 'bar-group';
 
     const valueEl = document.createElement('p');
     valueEl.className = 'bar-value';
-    valueEl.textContent = value.toFixed(1);
+    valueEl.textContent = value.toFixed(2);
 
     const track = document.createElement('div');
     track.className = 'bar-track';
@@ -335,15 +322,77 @@ function renderBarChart(factorScores) {
   });
 }
 
+function renderResultTable(factorScores, constructScores) {
+  const tableWrap = document.querySelector('#career-result-table');
+  tableWrap.innerHTML = '';
+
+  const table = document.createElement('table');
+  table.className = 'result-table';
+
+  const thead = document.createElement('thead');
+  const headerRow = document.createElement('tr');
+  ['Factors', 'Average scores (factors)', 'Average scores (constructs)', 'Constructs'].forEach((text) => {
+    const th = document.createElement('th');
+    th.textContent = text;
+    headerRow.append(th);
+  });
+  thead.append(headerRow);
+  table.append(thead);
+
+  const tbody = document.createElement('tbody');
+
+  Object.entries(CONSTRUCTS).forEach(([constructKey, construct]) => {
+    const factorCount = construct.factors.length;
+
+    construct.factors.forEach((factorKey, idx) => {
+      const tr = document.createElement('tr');
+
+      // Factor name cell
+      const tdFactor = document.createElement('td');
+      tdFactor.textContent = FACTORS[factorKey].label;
+      tr.append(tdFactor);
+
+      // Factor average score cell
+      const tdFactorScore = document.createElement('td');
+      tdFactorScore.className = 'factor-score-cell';
+      tdFactorScore.textContent = factorScores[factorKey].toFixed(2);
+      tr.append(tdFactorScore);
+
+      // Construct average score cell — only on first row, spans all factor rows
+      if (idx === 0) {
+        const tdConstructScore = document.createElement('td');
+        tdConstructScore.className = 'construct-avg-cell';
+        tdConstructScore.rowSpan = factorCount;
+        tdConstructScore.textContent = constructScores[constructKey].toFixed(2);
+        tr.append(tdConstructScore);
+
+        // Construct name cell — same rowspan
+        const tdConstruct = document.createElement('td');
+        tdConstruct.className = 'construct-cell';
+        tdConstruct.rowSpan = factorCount;
+        tdConstruct.textContent = construct.label;
+        tr.append(tdConstruct);
+      }
+
+      tbody.append(tr);
+    });
+  });
+
+  table.append(tbody);
+  tableWrap.append(table);
+}
+
 function renderResult(resultData, testedAt) {
   intentResultEl.textContent = resultData.career;
-  dominantFactorEl.textContent = resultData.dominantFactor.title;
-  dominantDescriptionEl.textContent = resultData.dominantFactor.description;
+  dominantFactorEl.textContent = resultData.dominantConstruct.title;
+  dominantDescriptionEl.textContent = resultData.dominantConstruct.description;
   testedAtEl.textContent = formatTestedAt(testedAt);
   if (testerNameEl) {
     testerNameEl.textContent = latestResultSnapshot && latestResultSnapshot.nickname ? latestResultSnapshot.nickname : '—';
   }
-  renderBarChart(resultData.factorScores);
+  const constructScores = calculateConstructScores(resultData.factorScores);
+  renderBarChart(constructScores);
+  renderResultTable(resultData.factorScores, constructScores);
   resultsSection.classList.remove('hidden');
   resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
@@ -367,7 +416,7 @@ function renderSavedHistory() {
     const title = document.createElement('p');
     title.className = 'history-title';
     const nicknamePrefix = itemData.nickname ? `[${itemData.nickname}] ` : '';
-    title.textContent = `${nicknamePrefix}${itemData.career} | ${FACTOR_LABELS[itemData.dominantFactorKey] ?? FACTOR_LABELS.balanced}`;
+    title.textContent = `${nicknamePrefix}${itemData.career} | ${CONSTRUCTS[itemData.dominantFactorKey]?.label ?? 'Balanced influences'}`;
 
     const meta = document.createElement('p');
     meta.className = 'history-meta';
@@ -389,15 +438,15 @@ function loadResultById(resultId) {
   const savedResult = savedHistory.find((item) => item.id === resultId);
   if (!savedResult) return;
   latestResultSnapshot = { ...savedResult };
-  const dominantFactorKey = savedResult.dominantFactorKey || 'balanced';
+  const dominantConstructKey = savedResult.dominantFactorKey || 'balanced';
   renderResult(
     {
       career: savedResult.career,
       factorScores: savedResult.factorScores,
-      dominantFactor: {
-        key: dominantFactorKey,
-        title: FACTOR_LABELS[dominantFactorKey] ?? FACTOR_LABELS.balanced,
-        description: FACTOR_DESCRIPTIONS[dominantFactorKey] ?? FACTOR_DESCRIPTIONS.balanced,
+      dominantConstruct: {
+        key: dominantConstructKey,
+        title: CONSTRUCTS[dominantConstructKey]?.label ?? 'Balanced influences',
+        description: CONSTRUCT_DESCRIPTIONS[dominantConstructKey] ?? CONSTRUCT_DESCRIPTIONS.balanced,
       },
     },
     savedResult.testedAt,
@@ -417,20 +466,23 @@ function isValidOrEmptyEmailAddress(value) {
 }
 
 function buildEmailBody(resultData) {
-  const dominantFactorTitle = FACTOR_LABELS[resultData.dominantFactorKey] ?? FACTOR_LABELS.balanced;
-  return [
+  const dominantConstructLabel = CONSTRUCTS[resultData.dominantFactorKey]?.label ?? 'Balanced influences';
+  const constructScores = calculateConstructScores(resultData.factorScores);
+  const lines = [
     '3 Factors of Career Choice Result',
     '',
     ...(resultData.nickname ? [`Tester: ${resultData.nickname}`, ''] : []),
     `Intended career: ${resultData.career}`,
     `Tested at: ${formatTestedAt(resultData.testedAt)}`,
-    `Dominant factor: ${dominantFactorTitle}`,
+    `Dominant construct: ${dominantConstructLabel}`,
     '',
-    `Personal fit & rewards: ${resultData.factorScores.personalFitAndRewards.toFixed(1)} / 5`,
-    `Work conditions & stability: ${resultData.factorScores.workConditionsAndStability.toFixed(1)} / 5`,
-    `Social service & collaboration: ${resultData.factorScores.socialAndServiceOrientation.toFixed(1)} / 5`,
-    `Social influence sources: ${resultData.factorScores.socialInfluence.toFixed(1)} / 5`,
-  ].join('\n');
+    'Factor scores:',
+    ...Object.entries(FACTORS).map(([key, f]) => `  ${f.label}: ${resultData.factorScores[key].toFixed(2)} / 5`),
+    '',
+    'Construct scores:',
+    ...Object.entries(CONSTRUCTS).map(([key, c]) => `  ${c.label}: ${constructScores[key].toFixed(2)} / 5`),
+  ];
+  return lines.join('\n');
 }
 
 function sendResultByEmail() {
@@ -465,14 +517,15 @@ form.addEventListener('submit', (event) => {
 
   const career = careerIntentInput.value.trim();
   const factorScores = calculateFactorScores();
-  const dominantFactor = determineDominantFactor(factorScores);
+  const constructScores = calculateConstructScores(factorScores);
+  const dominantConstruct = determineDominantConstruct(constructScores);
   const resultValues = {
     career,
     factorScores,
-    dominantFactor,
+    dominantConstruct,
   };
 
-  latestResultSnapshot = createResultSnapshot(career, factorScores, dominantFactor, new Date());
+  latestResultSnapshot = createResultSnapshot(career, factorScores, dominantConstruct, new Date());
   appendResultToHistory(latestResultSnapshot);
   renderResult(resultValues, latestResultSnapshot.testedAt);
   formError.textContent = '';

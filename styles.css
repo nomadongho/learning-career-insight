@@ -687,6 +687,42 @@ button:not(.rank-btn):not(.word-hint):active {
   font-size: 1.1rem;
 }
 
+/* ── Result table ────────────────────────── */
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin-top: 8px;
+}
+
+.result-table th,
+.result-table td {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.result-table thead th {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.result-table .factor-score-cell,
+.result-table .construct-avg-cell {
+  text-align: center;
+  font-weight: 600;
+}
+
+.result-table .construct-cell {
+  text-align: center;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
 /* ── Diamond chart ───────────────────────── */
 .axis-chart-wrap {
   overflow-x: auto;
