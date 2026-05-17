@@ -849,6 +849,68 @@ button:focus,
   }
 }
 
+/* ── Site nav ────────────────────────────── */
+.site-nav {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.site-nav-inner {
+  width: min(1160px, calc(100% - 40px));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  gap: 16px;
+}
+
+.site-brand {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--primary);
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.site-brand:hover {
+  color: var(--primary-dark);
+}
+
+.site-nav-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.site-nav-links a {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 99px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.site-nav-links a:hover,
+.site-nav-links a[aria-current="page"] {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
 /* ── Responsive ──────────────────────────── */
 @media (max-width: 920px) {
   .hero,
@@ -917,6 +979,15 @@ button:focus,
   .rank-btn {
     width: 30px;
     height: 30px;
+    font-size: 0.8rem;
+  }
+
+  .site-brand {
+    font-size: 0.8rem;
+  }
+
+  .site-nav-links a {
+    padding: 0 10px;
     font-size: 0.8rem;
   }
 }
