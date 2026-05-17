@@ -399,7 +399,7 @@ button:not(.rank-btn):not(.word-hint):active {
   justify-content: center;
   font-size: 0.82rem;
   line-height: 1.35;
-  min-height: 2.7em;
+  min-height: calc(1.35em * 2);
   flex: unset;
   margin: 0;
 }
