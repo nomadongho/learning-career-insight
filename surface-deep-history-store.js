@@ -28,7 +28,7 @@
       return null;
     }
     const normalizedResponses = normalizeResponses(responses);
-    if (responses !== undefined && !normalizedResponses) {
+    if (responses !== undefined && responses !== null && !normalizedResponses) {
       return null;
     }
 

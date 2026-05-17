@@ -37,7 +37,7 @@
       return null;
     }
     const normalizedSelections = normalizeSelections(selections);
-    if (selections !== undefined && !normalizedSelections) {
+    if (selections !== undefined && selections !== null && !normalizedSelections) {
       return null;
     }
 
