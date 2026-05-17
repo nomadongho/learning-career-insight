@@ -11,30 +11,8 @@ function formatTestedAt(dateValue) {
   }).format(resultHistoryStore.toDate(dateValue));
 }
 
-function formatEmailSubjectDate(dateValue) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  }).format(resultHistoryStore.toDate(dateValue));
-}
-
-function buildEmailBody(resultItem) {
-  const { scores, styleResult, testedAt, nickname } = resultItem;
-  const lines = [
-    'Learning Styles Assessment Result',
-    '',
-    ...(nickname ? [`Tester: ${nickname}`, ''] : []),
-    `Tested at: ${formatTestedAt(testedAt)}`,
-    '',
-    `Dominant style: ${styleResult.name}`,
-    '',
-    'Dimension totals',
-    `- CE: ${scores.CE}`,
-    `- RO: ${scores.RO}`,
-    `- AC: ${scores.AC}`,
-    `- AE: ${scores.AE}`,
-  ];
-  return lines.join('\n');
+function goToResultPage(resultId) {
+  window.location.href = `./index.html?resultId=${encodeURIComponent(resultId)}`;
 }
 
 function renderSavedResultHistory(items) {
@@ -47,7 +25,10 @@ function renderSavedResultHistory(items) {
   resultHistoryEmpty.classList.add('hidden');
   items.forEach((resultItem) => {
     const item = document.createElement('li');
-    item.className = 'history-item';
+    item.className = 'history-item history-link-item';
+    item.tabIndex = 0;
+    item.setAttribute('role', 'button');
+    item.dataset.historyId = resultItem.id;
 
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
@@ -64,23 +45,27 @@ function renderSavedResultHistory(items) {
     meta.textContent = formatTestedAt(resultItem.testedAt);
     copyWrap.append(title, meta);
 
-    const emailButton = document.createElement('button');
-    emailButton.type = 'button';
-    emailButton.className = 'text-link history-view-button';
-    emailButton.textContent = 'Email result';
-    emailButton.addEventListener('click', () => {
-      const subject = `Learning Styles Result (${formatEmailSubjectDate(resultItem.testedAt)})`;
-      const body = buildEmailBody(resultItem);
-      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    });
-
-    item.append(copyWrap, emailButton);
+    item.append(copyWrap);
     resultHistoryList.append(item);
   });
 }
 
 let savedResultHistory = resultHistoryStore.load();
 renderSavedResultHistory(savedResultHistory);
+
+resultHistoryList.addEventListener('click', (event) => {
+  const item = event.target.closest('.history-item[data-history-id]');
+  if (!item) return;
+  goToResultPage(item.dataset.historyId);
+});
+
+resultHistoryList.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  const item = event.target.closest('.history-item[data-history-id]');
+  if (!item) return;
+  goToResultPage(item.dataset.historyId);
+});
 
 historyClearButton.addEventListener('click', () => {
   savedResultHistory = [];

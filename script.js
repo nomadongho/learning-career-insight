@@ -481,7 +481,10 @@ function renderSavedResultHistory() {
   resultHistoryEmpty.classList.add('hidden');
   savedResultHistory.forEach((resultItem) => {
     const item = document.createElement('li');
-    item.className = 'history-item';
+    item.className = 'history-item history-link-item';
+    item.tabIndex = 0;
+    item.setAttribute('role', 'button');
+    item.dataset.historyId = resultItem.id;
 
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
@@ -498,13 +501,7 @@ function renderSavedResultHistory() {
     meta.textContent = formatTestedAt(resultItem.testedAt);
     copyWrap.append(title, meta);
 
-    const viewButton = document.createElement('button');
-    viewButton.type = 'button';
-    viewButton.className = 'text-link history-view-button';
-    viewButton.dataset.historyId = resultItem.id;
-    viewButton.textContent = 'View result';
-
-    item.append(copyWrap, viewButton);
+    item.append(copyWrap);
     resultHistoryList.append(item);
   });
 }
@@ -543,6 +540,12 @@ function loadSavedResultById(resultId) {
     testedAt: savedResult.testedAt,
   };
   renderResults(savedResult.scores, savedResult.styleResult, savedResult.testedAt);
+}
+
+function loadResultFromQuery() {
+  const requestedResultId = new URLSearchParams(window.location.search).get('resultId');
+  if (!requestedResultId) return;
+  loadSavedResultById(requestedResultId);
 }
 
 function isValidOrEmptyEmailAddress(emailAddress) {
@@ -839,9 +842,16 @@ resetButton.addEventListener('click', () => {
 
 if (resultHistoryList) {
   resultHistoryList.addEventListener('click', (event) => {
-    const viewButton = event.target.closest('.history-view-button');
-    if (!viewButton) return;
-    loadSavedResultById(viewButton.dataset.historyId);
+    const item = event.target.closest('.history-item[data-history-id]');
+    if (!item) return;
+    loadSavedResultById(item.dataset.historyId);
+  });
+  resultHistoryList.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    const item = event.target.closest('.history-item[data-history-id]');
+    if (!item) return;
+    loadSavedResultById(item.dataset.historyId);
   });
 }
 
@@ -856,3 +866,4 @@ if (historyClearButton) {
 savedResultHistory = loadSavedResultHistory();
 renderQuestions();
 renderSavedResultHistory();
+loadResultFromQuery();
