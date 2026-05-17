@@ -31,19 +31,19 @@ const CAREER_SCALE_OPTIONS = [
 ];
 
 const FACTOR_LABELS = {
-  personalFitAndRewards: 'Career priorities (Cluster A)',
-  workConditionsAndStability: 'Career priorities (Cluster B)',
-  socialAndServiceOrientation: 'Career priorities (Cluster C)',
+  personalFitAndRewards: 'Personal background & rewards',
+  workConditionsAndStability: 'Work environment & stability',
+  socialAndServiceOrientation: 'Social impact & collaboration',
   balanced: 'Balanced influences',
 };
 
 const FACTOR_DESCRIPTIONS = {
   personalFitAndRewards:
-    'Your highest average score is in Cluster A.',
+    'Your responses emphasize personal background, qualifications, and reward-oriented career priorities.',
   workConditionsAndStability:
-    'Your highest average score is in Cluster B.',
+    'Your responses emphasize practical work conditions, career continuity, and long-term stability.',
   socialAndServiceOrientation:
-    'Your highest average score is in Cluster C.',
+    'Your responses emphasize collaboration and helping/working with other people.',
   balanced: 'Your factor scores are tied, so your current career decision appears balanced across multiple influences.',
 };
 
@@ -392,9 +392,9 @@ function buildEmailBody(resultData) {
     `Tested at: ${formatTestedAt(resultData.testedAt)}`,
     `Dominant factor: ${dominantFactorTitle}`,
     '',
-    `Career priorities (Cluster A): ${resultData.factorScores.personalFitAndRewards.toFixed(1)} / 5`,
-    `Career priorities (Cluster B): ${resultData.factorScores.workConditionsAndStability.toFixed(1)} / 5`,
-    `Career priorities (Cluster C): ${resultData.factorScores.socialAndServiceOrientation.toFixed(1)} / 5`,
+    `Personal background & rewards: ${resultData.factorScores.personalFitAndRewards.toFixed(1)} / 5`,
+    `Work environment & stability: ${resultData.factorScores.workConditionsAndStability.toFixed(1)} / 5`,
+    `Social impact & collaboration: ${resultData.factorScores.socialAndServiceOrientation.toFixed(1)} / 5`,
   ].join('\n');
 }
 
