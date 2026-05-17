@@ -552,7 +552,7 @@ function renderSavedResultHistory() {
 function createResultSnapshot(scores, styleResult, testedAt) {
   const testedAtIso = toDate(testedAt).toISOString();
   snapshotCounter += 1;
-  const fallbackId = `${Date.now()}-${Math.floor(performance.now() * 1000)}-${snapshotCounter}`;
+  const fallbackId = `${Date.now()}-${snapshotCounter}-${Math.random().toString(16).slice(2, 10)}`;
   const snapshotId =
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()
