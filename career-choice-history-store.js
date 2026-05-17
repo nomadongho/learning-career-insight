@@ -97,12 +97,18 @@
   }
 
   function formatScoreSummary(factorScores) {
-    return [
-      `Prestige ${factorScores.prestigeFinancial.toFixed(2)}`,
-      `Security ${factorScores.securityOfEmployment.toFixed(2)}`,
-      `WLB ${factorScores.workLifeBalance.toFixed(2)}`,
-      `Fulfilment ${factorScores.selfFulfilment.toFixed(2)}`,
-    ].join(' · ');
+    const constructGroups = {
+      Extrinsic:     ['prestigeFinancial', 'securityOfEmployment', 'workLifeBalance'],
+      Intrinsic:     ['selfFulfilment', 'goodCitizen'],
+      Interpersonal: ['looseRelations', 'closeRelations'],
+      Other:         ['predisposition', 'travel'],
+    };
+    return Object.entries(constructGroups)
+      .map(([label, keys]) => {
+        const avg = keys.reduce((s, k) => s + factorScores[k], 0) / keys.length;
+        return `${label} ${avg.toFixed(2)}`;
+      })
+      .join(' · ');
   }
 
   window.careerChoiceResultHistoryStore = {
