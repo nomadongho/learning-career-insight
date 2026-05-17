@@ -27,6 +27,10 @@ function renderSavedResultHistory(items) {
     const title = document.createElement('p');
     title.className = 'history-title';
     title.textContent = `${resultItem.styleResult.name} | ${resultHistoryStore.formatScoreSummary(resultItem.scores)}`;
+    title.setAttribute(
+      'aria-label',
+      `Style ${resultItem.styleResult.name}, scores CE ${resultItem.scores.CE}, RO ${resultItem.scores.RO}, AC ${resultItem.scores.AC}, AE ${resultItem.scores.AE}`,
+    );
 
     const meta = document.createElement('p');
     meta.className = 'history-meta';
