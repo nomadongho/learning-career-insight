@@ -31,19 +31,19 @@ const CAREER_SCALE_OPTIONS = [
 ];
 
 const FACTOR_LABELS = {
-  personalFitAndRewards: 'Personal fit & rewards',
-  workConditionsAndStability: 'Work conditions & stability',
-  socialAndServiceOrientation: 'Social & service orientation',
+  personalFitAndRewards: 'Career priorities (Cluster A)',
+  workConditionsAndStability: 'Career priorities (Cluster B)',
+  socialAndServiceOrientation: 'Career priorities (Cluster C)',
   balanced: 'Balanced influences',
 };
 
 const FACTOR_DESCRIPTIONS = {
   personalFitAndRewards:
-    'You currently prioritize personal fit and career rewards (interest, aptitude, and earning-related factors) most strongly.',
+    'Your highest average score is in Cluster A.',
   workConditionsAndStability:
-    'You currently prioritize day-to-day work conditions and long-term employment stability most strongly.',
+    'Your highest average score is in Cluster B.',
   socialAndServiceOrientation:
-    'You currently prioritize people-oriented and service-oriented aspects of careers most strongly.',
+    'Your highest average score is in Cluster C.',
   balanced: 'Your factor scores are tied, so your current career decision appears balanced across multiple influences.',
 };
 
@@ -392,9 +392,9 @@ function buildEmailBody(resultData) {
     `Tested at: ${formatTestedAt(resultData.testedAt)}`,
     `Dominant factor: ${dominantFactorTitle}`,
     '',
-    `Personal fit & rewards: ${resultData.factorScores.personalFitAndRewards.toFixed(1)} / 5`,
-    `Work conditions & stability: ${resultData.factorScores.workConditionsAndStability.toFixed(1)} / 5`,
-    `Social & service orientation: ${resultData.factorScores.socialAndServiceOrientation.toFixed(1)} / 5`,
+    `Career priorities (Cluster A): ${resultData.factorScores.personalFitAndRewards.toFixed(1)} / 5`,
+    `Career priorities (Cluster B): ${resultData.factorScores.workConditionsAndStability.toFixed(1)} / 5`,
+    `Career priorities (Cluster C): ${resultData.factorScores.socialAndServiceOrientation.toFixed(1)} / 5`,
   ].join('\n');
 }
 
