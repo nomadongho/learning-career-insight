@@ -11,25 +11,8 @@ function formatTestedAt(dateValue) {
   }).format(store.toDate(dateValue));
 }
 
-function formatEmailSubjectDate(dateValue) {
-  return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  }).format(store.toDate(dateValue));
-}
-
-function buildEmailBody(resultItem) {
-  const lines = [
-    'Surface vs Deep Learners Result',
-    '',
-    ...(resultItem.nickname ? [`Tester: ${resultItem.nickname}`, ''] : []),
-    `Tested at: ${formatTestedAt(resultItem.testedAt)}`,
-    `Dominant approach: ${resultItem.dominantType}`,
-    '',
-    `Deep total: ${resultItem.deepTotal}`,
-    `Surface total: ${resultItem.surfaceTotal}`,
-  ];
-  return lines.join('\n');
+function goToResultPage(resultId) {
+  window.location.href = `./surface-deep.html?resultId=${encodeURIComponent(resultId)}`;
 }
 
 function renderSavedResultHistory(items) {
@@ -42,7 +25,10 @@ function renderSavedResultHistory(items) {
   resultHistoryEmpty.classList.add('hidden');
   items.forEach((resultItem) => {
     const item = document.createElement('li');
-    item.className = 'history-item';
+    item.className = 'history-item history-link-item';
+    item.tabIndex = 0;
+    item.setAttribute('role', 'button');
+    item.dataset.historyId = resultItem.id;
 
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
@@ -55,23 +41,27 @@ function renderSavedResultHistory(items) {
     meta.textContent = formatTestedAt(resultItem.testedAt);
     copyWrap.append(title, meta);
 
-    const emailButton = document.createElement('button');
-    emailButton.type = 'button';
-    emailButton.className = 'text-link history-view-button';
-    emailButton.textContent = 'Email result';
-    emailButton.addEventListener('click', () => {
-      const subject = `Surface vs Deep Result (${formatEmailSubjectDate(resultItem.testedAt)})`;
-      const body = buildEmailBody(resultItem);
-      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    });
-
-    item.append(copyWrap, emailButton);
+    item.append(copyWrap);
     resultHistoryList.append(item);
   });
 }
 
 let savedHistory = store.load();
 renderSavedResultHistory(savedHistory);
+
+resultHistoryList.addEventListener('click', (event) => {
+  const item = event.target.closest('.history-item[data-history-id]');
+  if (!item) return;
+  goToResultPage(item.dataset.historyId);
+});
+
+resultHistoryList.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+  event.preventDefault();
+  const item = event.target.closest('.history-item[data-history-id]');
+  if (!item) return;
+  goToResultPage(item.dataset.historyId);
+});
 
 historyClearButton.addEventListener('click', () => {
   savedHistory = [];

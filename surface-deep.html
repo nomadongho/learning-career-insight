@@ -110,6 +110,17 @@
           <div id="surface-bar-chart" class="bar-chart bar-chart-dual"></div>
         </article>
 
+        <article class="summary-card result-history-card">
+          <div class="history-header">
+            <p class="summary-label">Saved results</p>
+            <button class="button button-secondary history-clear-button" type="button" id="surface-history-clear-button">
+              Clear history
+            </button>
+          </div>
+          <p id="surface-history-empty" class="history-empty">No saved results yet.</p>
+          <ul id="surface-history-list" class="history-list"></ul>
+        </article>
+
         <article class="summary-card result-share-card">
           <p class="summary-label">Result sharing</p>
           <div class="share-actions">
@@ -123,17 +134,6 @@
             <button class="button button-secondary" type="button" id="surface-email-send-button">Email this result</button>
           </div>
           <p id="surface-email-error" class="share-error" aria-live="polite"></p>
-        </article>
-
-        <article class="summary-card result-history-card">
-          <div class="history-header">
-            <p class="summary-label">Saved results</p>
-            <button class="button button-secondary history-clear-button" type="button" id="surface-history-clear-button">
-              Clear history
-            </button>
-          </div>
-          <p id="surface-history-empty" class="history-empty">No saved results yet.</p>
-          <ul id="surface-history-list" class="history-list"></ul>
         </article>
       </section>
     </main>
