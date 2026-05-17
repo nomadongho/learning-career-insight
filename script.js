@@ -134,6 +134,7 @@ const styleMeta = {
 const MAX_SCORE = assessmentRows.length * 4;
 const AXIS_LIMIT = assessmentRows.length * 3;
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const RANK_VALUES = ['1', '2', '3', '4'];
 const answers = assessmentRows.map(() => Array(4).fill(''));
 
 const questionList = document.querySelector('#question-list');
@@ -307,14 +308,14 @@ function renderQuestions() {
       const rankGroup = document.createElement('div');
       rankGroup.className = 'rank-group';
 
-      [1, 2, 3, 4].forEach((rank) => {
+      RANK_VALUES.forEach((rank) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'rank-btn';
-        btn.textContent = String(rank);
+        btn.textContent = rank;
         btn.dataset.rowIndex = String(rowIndex);
         btn.dataset.optionIndex = String(optionIndex);
-        btn.dataset.rank = String(rank);
+        btn.dataset.rank = rank;
         rankGroup.append(btn);
       });
 
@@ -338,6 +339,8 @@ function updateProgress() {
 }
 
 function setAnswer(rowIndex, optionIndex, rank) {
+  const wasSelected = answers[rowIndex][optionIndex] === rank;
+
   // If another option in the row already has this rank, clear it
   answers[rowIndex].forEach((answer, i) => {
     if (answer === rank && i !== optionIndex) {
@@ -346,7 +349,22 @@ function setAnswer(rowIndex, optionIndex, rank) {
   });
 
   // Toggle: clicking the same rank again deselects it
-  answers[rowIndex][optionIndex] = answers[rowIndex][optionIndex] === rank ? '' : rank;
+  answers[rowIndex][optionIndex] = wasSelected ? '' : rank;
+
+  // Auto-complete the final option when exactly one rank and one option are left.
+  if (!wasSelected) {
+    const rowAnswers = answers[rowIndex];
+    const filledCount = rowAnswers.filter(Boolean).length;
+
+    if (filledCount === 3) {
+      const missingOptionIndex = rowAnswers.findIndex((value) => value === '');
+      const remainingRank = RANK_VALUES.find((candidate) => !rowAnswers.includes(candidate));
+
+      if (missingOptionIndex !== -1 && remainingRank) {
+        rowAnswers[missingOptionIndex] = remainingRank;
+      }
+    }
+  }
 
   updateRankButtons(rowIndex);
   updateProgress();
