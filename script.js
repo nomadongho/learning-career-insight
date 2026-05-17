@@ -516,6 +516,7 @@ function formatScoreSummary(scores) {
 }
 
 function renderSavedResultHistory() {
+  if (!resultHistoryList || !resultHistoryEmpty) return;
   resultHistoryList.innerHTML = '';
 
   if (savedResultHistory.length === 0) {
@@ -875,17 +876,21 @@ resetButton.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
-resultHistoryList.addEventListener('click', (event) => {
-  const viewButton = event.target.closest('.history-view-button');
-  if (!viewButton) return;
-  loadSavedResultById(viewButton.dataset.historyId);
-});
+if (resultHistoryList) {
+  resultHistoryList.addEventListener('click', (event) => {
+    const viewButton = event.target.closest('.history-view-button');
+    if (!viewButton) return;
+    loadSavedResultById(viewButton.dataset.historyId);
+  });
+}
 
-historyClearButton.addEventListener('click', () => {
-  savedResultHistory = [];
-  persistSavedResultHistory();
-  renderSavedResultHistory();
-});
+if (historyClearButton) {
+  historyClearButton.addEventListener('click', () => {
+    savedResultHistory = [];
+    persistSavedResultHistory();
+    renderSavedResultHistory();
+  });
+}
 
 savedResultHistory = loadSavedResultHistory();
 renderQuestions();
