@@ -301,6 +301,21 @@ button:not(.rank-btn):not(.word-hint):active {
   gap: 16px;
 }
 
+.question-section-header {
+  padding: 8px 4px 0;
+}
+
+.question-section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border, #e5e7eb);
+  padding-bottom: 8px;
+  margin: 0;
+}
+
 .question-card {
   padding: 24px;
   overflow: hidden;

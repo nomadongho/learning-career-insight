@@ -1,12 +1,27 @@
 (function initCareerChoiceResultHistoryStore() {
-  const storageKey = 'careerChoiceResultHistory.v1';
+  const storageKey = 'careerChoiceResultHistory.v2';
   const limit = 30;
   const dominantFactorLabels = {
-    people: 'People around you',
-    guidance: 'Teachers/counselor input',
-    media: 'External material/media',
+    personalFitAndRewards: 'Personal fit & rewards',
+    workConditionsAndStability: 'Work conditions & stability',
+    socialAndServiceOrientation: 'Social service & collaboration',
+    socialInfluence: 'Social influence sources',
     balanced: 'Balanced influences',
   };
+
+  const allItemIds = [
+    'v1','v2','v3','v4','v5','v6','v7','v8','v9','v10',
+    'v11','v12','v13','v14','v15','v16','v17','v18','v19','v20',
+    'v21','v22','v23','v24','v25','v26',
+    'q1','q2','q3','q4','q5','q6','q7',
+  ];
+
+  const factorScoreKeys = [
+    'personalFitAndRewards',
+    'workConditionsAndStability',
+    'socialAndServiceOrientation',
+    'socialInfluence',
+  ];
 
   function toDate(value) {
     if (value instanceof Date) return value;
@@ -16,28 +31,18 @@
 
   function normalize(rawResult) {
     if (!rawResult || typeof rawResult !== 'object') return null;
-    const { id, career, ratings, factorScores, dominantFactorKey, dominantFactor, testedAt } = rawResult;
+    const { id, career, ratings, factorScores, dominantFactorKey, testedAt } = rawResult;
     const testedAtDate = toDate(testedAt);
+
     const hasRatings =
       ratings &&
-      typeof ratings.parents === 'number' &&
-      typeof ratings.teachers === 'number' &&
-      typeof ratings.peersAndFriends === 'number' &&
-      typeof ratings.relativesAndFamilyFriends === 'number' &&
-      typeof ratings.careerGuidanceCounselor === 'number' &&
-      typeof ratings.visitingSpeakers === 'number' &&
-      typeof ratings.promotionalMaterial === 'number';
+      typeof ratings === 'object' &&
+      allItemIds.every((key) => typeof ratings[key] === 'number');
+
     const hasFactorScores =
       factorScores &&
-      typeof factorScores.people === 'number' &&
-      typeof factorScores.guidance === 'number' &&
-      typeof factorScores.media === 'number';
-
-    const legacyDominantFactorKey =
-      typeof dominantFactor === 'string'
-        ? Object.entries(dominantFactorLabels).find(([, label]) => label === dominantFactor)?.[0]
-        : '';
-    const normalizedDominantFactorKey = dominantFactorKey || legacyDominantFactorKey;
+      typeof factorScores === 'object' &&
+      factorScoreKeys.every((key) => typeof factorScores[key] === 'number');
 
     if (
       !id ||
@@ -45,32 +50,23 @@
       !career.trim() ||
       !hasRatings ||
       !hasFactorScores ||
-      typeof normalizedDominantFactorKey !== 'string' ||
-      !dominantFactorLabels[normalizedDominantFactorKey] ||
+      typeof dominantFactorKey !== 'string' ||
+      !dominantFactorLabels[dominantFactorKey] ||
       Number.isNaN(testedAtDate.getTime())
     ) {
       return null;
     }
 
+    const normalizedRatings = Object.fromEntries(allItemIds.map((key) => [key, ratings[key]]));
+    const normalizedFactorScores = Object.fromEntries(factorScoreKeys.map((key) => [key, factorScores[key]]));
+
     return {
       id: String(id),
       nickname: typeof rawResult.nickname === 'string' ? rawResult.nickname : '',
       career: career.trim(),
-      ratings: {
-        parents: ratings.parents,
-        teachers: ratings.teachers,
-        peersAndFriends: ratings.peersAndFriends,
-        relativesAndFamilyFriends: ratings.relativesAndFamilyFriends,
-        careerGuidanceCounselor: ratings.careerGuidanceCounselor,
-        visitingSpeakers: ratings.visitingSpeakers,
-        promotionalMaterial: ratings.promotionalMaterial,
-      },
-      factorScores: {
-        people: factorScores.people,
-        guidance: factorScores.guidance,
-        media: factorScores.media,
-      },
-      dominantFactorKey: normalizedDominantFactorKey,
+      ratings: normalizedRatings,
+      factorScores: normalizedFactorScores,
+      dominantFactorKey,
       testedAt: testedAtDate.toISOString(),
     };
   }
@@ -96,7 +92,12 @@
   }
 
   function formatScoreSummary(factorScores) {
-    return `People ${factorScores.people.toFixed(1)} · Guidance ${factorScores.guidance.toFixed(1)} · Media ${factorScores.media.toFixed(1)}`;
+    return [
+      `Personal ${factorScores.personalFitAndRewards.toFixed(1)}`,
+      `Practical ${factorScores.workConditionsAndStability.toFixed(1)}`,
+      `Social ${factorScores.socialAndServiceOrientation.toFixed(1)}`,
+      `Influence ${factorScores.socialInfluence.toFixed(1)}`,
+    ].join(' · ');
   }
 
   window.careerChoiceResultHistoryStore = {
