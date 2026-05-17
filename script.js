@@ -511,6 +511,10 @@ function persistSavedResultHistory() {
   }
 }
 
+function formatScoreSummary(scores) {
+  return `${scores.CE}/${scores.RO}/${scores.AC}/${scores.AE}`;
+}
+
 function renderSavedResultHistory() {
   resultHistoryList.innerHTML = '';
 
@@ -527,7 +531,7 @@ function renderSavedResultHistory() {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${resultItem.styleResult.name} | ${resultItem.scores.CE}/${resultItem.scores.RO}/${resultItem.scores.AC}/${resultItem.scores.AE}`;
+    title.textContent = `${resultItem.styleResult.name} | ${formatScoreSummary(resultItem.scores)}`;
     title.setAttribute(
       'aria-label',
       `Style ${resultItem.styleResult.name}, scores CE ${resultItem.scores.CE}, RO ${resultItem.scores.RO}, AC ${resultItem.scores.AC}, AE ${resultItem.scores.AE}`,
@@ -552,7 +556,7 @@ function renderSavedResultHistory() {
 function createResultSnapshot(scores, styleResult, testedAt) {
   const testedAtIso = toDate(testedAt).toISOString();
   snapshotCounter += 1;
-  const fallbackId = `${Date.now()}-${snapshotCounter}-${Math.random().toString(16).slice(2, 10)}`;
+  const fallbackId = `${Date.now()}-${snapshotCounter}-${Math.random().toString(16).slice(2, 10).padEnd(8, '0')}`;
   const snapshotId =
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID()
