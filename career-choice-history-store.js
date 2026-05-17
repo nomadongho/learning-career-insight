@@ -54,6 +54,7 @@
 
     return {
       id: String(id),
+      nickname: typeof rawResult.nickname === 'string' ? rawResult.nickname : '',
       career: career.trim(),
       ratings: {
         parents: ratings.parents,

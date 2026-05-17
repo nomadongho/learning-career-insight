@@ -11,6 +11,32 @@ function formatTestedAt(dateValue) {
   }).format(resultHistoryStore.toDate(dateValue));
 }
 
+function formatEmailSubjectDate(dateValue) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(resultHistoryStore.toDate(dateValue));
+}
+
+function buildEmailBody(resultItem) {
+  const { scores, styleResult, testedAt, nickname } = resultItem;
+  const lines = [
+    'Learning Styles Assessment Result',
+    '',
+    ...(nickname ? [`Tester: ${nickname}`, ''] : []),
+    `Tested at: ${formatTestedAt(testedAt)}`,
+    '',
+    `Dominant style: ${styleResult.name}`,
+    '',
+    'Dimension totals',
+    `- CE: ${scores.CE}`,
+    `- RO: ${scores.RO}`,
+    `- AC: ${scores.AC}`,
+    `- AE: ${scores.AE}`,
+  ];
+  return lines.join('\n');
+}
+
 function renderSavedResultHistory(items) {
   resultHistoryList.innerHTML = '';
   if (items.length === 0) {
@@ -26,7 +52,8 @@ function renderSavedResultHistory(items) {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${resultItem.styleResult.name} | ${resultHistoryStore.formatScoreSummary(resultItem.scores)}`;
+    const nicknamePrefix = resultItem.nickname ? `[${resultItem.nickname}] ` : '';
+    title.textContent = `${nicknamePrefix}${resultItem.styleResult.name} | ${resultHistoryStore.formatScoreSummary(resultItem.scores)}`;
     title.setAttribute(
       'aria-label',
       `Style ${resultItem.styleResult.name}, scores CE ${resultItem.scores.CE}, RO ${resultItem.scores.RO}, AC ${resultItem.scores.AC}, AE ${resultItem.scores.AE}`,
@@ -37,7 +64,17 @@ function renderSavedResultHistory(items) {
     meta.textContent = formatTestedAt(resultItem.testedAt);
     copyWrap.append(title, meta);
 
-    item.append(copyWrap);
+    const emailButton = document.createElement('button');
+    emailButton.type = 'button';
+    emailButton.className = 'text-link history-view-button';
+    emailButton.textContent = 'Email result';
+    emailButton.addEventListener('click', () => {
+      const subject = `Learning Styles Result (${formatEmailSubjectDate(resultItem.testedAt)})`;
+      const body = buildEmailBody(resultItem);
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+
+    item.append(copyWrap, emailButton);
     resultHistoryList.append(item);
   });
 }

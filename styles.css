@@ -92,6 +92,10 @@ ul {
   text-transform: uppercase;
 }
 
+.summary-label-spaced {
+  margin-top: 12px;
+}
+
 h1 {
   margin-bottom: 16px;
   font-size: clamp(2.4rem, 4.8vw, 4rem);

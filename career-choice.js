@@ -52,6 +52,8 @@ const intentResultEl = document.querySelector('#career-intent-result');
 const dominantFactorEl = document.querySelector('#career-dominant-factor');
 const dominantDescriptionEl = document.querySelector('#career-dominant-description');
 const testedAtEl = document.querySelector('#career-tested-at');
+const testerNameEl = document.querySelector('#career-tester-name');
+const nicknameInput = document.querySelector('#career-nickname-input');
 const barChart = document.querySelector('#career-bar-chart');
 const resetButton = document.querySelector('#career-reset-button');
 const emailInput = document.querySelector('#career-email-recipient');
@@ -164,6 +166,10 @@ function setAnswer(itemId, answerValue) {
 }
 
 function validateAnswers() {
+  if (!nicknameInput.value.trim()) {
+    return 'Please enter a nickname before submitting.';
+  }
+
   const intendedCareer = careerIntentInput.value.trim();
   if (!intendedCareer) {
     return 'Please enter your intended career.';
@@ -215,6 +221,7 @@ function createResultSnapshot(career, factorScores, dominantFactor, testedAt) {
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : fallbackId;
   return {
     id: snapshotId,
+    nickname: nicknameInput.value.trim(),
     career,
     ratings: { ...answers },
     factorScores: { ...factorScores },
@@ -258,6 +265,9 @@ function renderResult(resultData, testedAt) {
   dominantFactorEl.textContent = resultData.dominantFactor.title;
   dominantDescriptionEl.textContent = resultData.dominantFactor.description;
   testedAtEl.textContent = formatTestedAt(testedAt);
+  if (testerNameEl) {
+    testerNameEl.textContent = latestResultSnapshot && latestResultSnapshot.nickname ? latestResultSnapshot.nickname : '—';
+  }
   renderBarChart(resultData.factorScores);
   resultsSection.classList.remove('hidden');
   resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -278,7 +288,8 @@ function renderSavedHistory() {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${itemData.career} | ${FACTOR_LABELS[itemData.dominantFactorKey] ?? FACTOR_LABELS.balanced}`;
+    const nicknamePrefix = itemData.nickname ? `[${itemData.nickname}] ` : '';
+    title.textContent = `${nicknamePrefix}${itemData.career} | ${FACTOR_LABELS[itemData.dominantFactorKey] ?? FACTOR_LABELS.balanced}`;
 
     const meta = document.createElement('p');
     meta.className = 'history-meta';
@@ -332,6 +343,7 @@ function buildEmailBody(resultData) {
   return [
     '3 Factors of Career Choice Result',
     '',
+    ...(resultData.nickname ? [`Tester: ${resultData.nickname}`, ''] : []),
     `Intended career: ${resultData.career}`,
     `Tested at: ${formatTestedAt(resultData.testedAt)}`,
     `Dominant factor: ${dominantFactorTitle}`,

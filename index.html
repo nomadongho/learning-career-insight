@@ -84,6 +84,23 @@
         </div>
 
         <form id="assessment-form" novalidate>
+          <article class="question-card">
+            <div class="question-top">
+              <div class="question-left">
+                <span class="row-badge">★</span>
+                <p class="question-note">Who is taking this test? (nickname)</p>
+              </div>
+            </div>
+            <input
+              id="nickname-input"
+              class="email-input"
+              type="text"
+              placeholder="e.g. Alex"
+              autocomplete="off"
+              maxlength="60"
+            />
+          </article>
+
           <div id="question-list" class="question-list"></div>
 
           <p id="form-error" class="form-error" aria-live="polite"></p>
@@ -149,6 +166,10 @@
 
         <article class="summary-card result-share-card">
           <p class="summary-label">Result sharing</p>
+          <p class="summary-meta">
+            Tester:
+            <strong id="tester-name-value">—</strong>
+          </p>
           <p class="summary-meta">
             Tested at:
             <strong id="tested-at-value">—</strong>
