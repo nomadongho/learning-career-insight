@@ -138,7 +138,7 @@ select {
 }
 
 .button,
-button:not(.rank-btn) {
+button:not(.rank-btn):not(.word-hint) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -157,14 +157,14 @@ button:not(.rank-btn) {
 }
 
 .button:hover,
-button:not(.rank-btn):hover {
+button:not(.rank-btn):not(.word-hint):hover {
   transform: translateY(-2px);
   background: var(--primary-dark);
   box-shadow: 0 6px 22px rgba(37, 99, 235, 0.38);
 }
 
 .button:active,
-button:not(.rank-btn):active {
+button:not(.rank-btn):not(.word-hint):active {
   transform: translateY(0);
 }
 
@@ -552,6 +552,131 @@ button:focus,
 
 .results-panel:not(.hidden) {
   animation: fade-up 400ms ease both;
+}
+
+/* ── Word hint button ────────────────────── */
+.option-label {
+  gap: 6px;
+  justify-content: center;
+}
+
+.word-hint {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1.5px solid var(--primary);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+  box-shadow: none;
+  min-height: unset;
+}
+
+.word-hint:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: none;
+  box-shadow: none;
+}
+
+.word-hint:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
+
+/* ── Word tooltip (speech bubble) ────────── */
+.word-tooltip {
+  position: fixed;
+  z-index: 9999;
+  width: max-content;
+  max-width: 240px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1.5px solid #c4d4ec;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.18), 0 2px 8px rgba(15, 23, 42, 0.08);
+  transform: translateX(-50%);
+  pointer-events: none;
+  animation: tooltip-pop 180ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.word-tooltip.hidden {
+  display: none;
+}
+
+/* Arrow pointing down (tooltip above button) */
+.word-tooltip::before,
+.word-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: auto;
+  top: auto;
+  left: calc(50% + var(--arrow-offset, 0px));
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+}
+
+.word-tooltip::before {
+  bottom: -11px;
+  border-top: 10px solid #c4d4ec;
+}
+
+.word-tooltip::after {
+  bottom: -9px;
+  border-top: 9px solid #fff;
+}
+
+/* Arrow pointing up (tooltip below button) */
+.word-tooltip--below::before {
+  bottom: auto;
+  top: -11px;
+  border-top: none;
+  border-bottom: 10px solid #c4d4ec;
+}
+
+.word-tooltip--below::after {
+  bottom: auto;
+  top: -9px;
+  border-top: none;
+  border-bottom: 9px solid #fff;
+}
+
+.word-tooltip-title {
+  margin: 0 0 4px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+
+.word-tooltip-body {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+@keyframes tooltip-pop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
 }
 
 /* ── Responsive ──────────────────────────── */
