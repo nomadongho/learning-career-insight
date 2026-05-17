@@ -141,6 +141,30 @@
             </div>
           </article>
         </div>
+
+        <article class="summary-card result-share-card">
+          <p class="summary-label">Result sharing</p>
+          <p class="summary-meta">
+            Tested at:
+            <strong id="tested-at-value">—</strong>
+          </p>
+          <div class="share-actions">
+            <input
+              id="email-recipient"
+              class="email-input"
+              type="email"
+              placeholder="recipient@example.com (optional)"
+              autocomplete="email"
+            />
+            <button class="button button-secondary" type="button" id="email-send-button">
+              Email this result
+            </button>
+          </div>
+          <p id="email-error" class="share-error" aria-live="polite"></p>
+          <p class="share-note">
+            Email includes your timestamp, score summary, and graph data for later comparisons.
+          </p>
+        </article>
       </section>
     </main>
 
