@@ -135,6 +135,8 @@ const MAX_SCORE = assessmentRows.length * 4;
 const AXIS_LIMIT = assessmentRows.length * 3;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const RANK_VALUES = ['1', '2', '3', '4'];
+const RESULT_HISTORY_STORAGE_KEY = 'learningStylesResultHistory.v1';
+const RESULT_HISTORY_LIMIT = 30;
 const answers = assessmentRows.map(() => Array(4).fill(''));
 
 const questionList = document.querySelector('#question-list');
@@ -156,8 +158,12 @@ const testedAtValue = document.querySelector('#tested-at-value');
 const emailRecipientInput = document.querySelector('#email-recipient');
 const emailSendButton = document.querySelector('#email-send-button');
 const emailError = document.querySelector('#email-error');
+const resultHistoryList = document.querySelector('#result-history-list');
+const resultHistoryEmpty = document.querySelector('#result-history-empty');
+const historyClearButton = document.querySelector('#history-clear-button');
 
 let latestResultSnapshot = null;
+let savedResultHistory = [];
 const emailValidationInput = document.createElement('input');
 emailValidationInput.type = 'email';
 
@@ -431,18 +437,139 @@ function determineStyle(scores) {
   return { name: 'Diverging', horizontal, vertical };
 }
 
+function toDate(dateValue) {
+  if (dateValue instanceof Date) {
+    return dateValue;
+  }
+  const parsed = new Date(dateValue);
+  return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
 function formatTestedAt(dateValue) {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'full',
     timeStyle: 'medium',
-  }).format(dateValue);
+  }).format(toDate(dateValue));
 }
 
 function formatEmailSubjectDate(dateValue) {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'short',
     timeStyle: 'short',
-  }).format(dateValue);
+  }).format(toDate(dateValue));
+}
+
+function normalizeSavedResult(rawResult) {
+  if (!rawResult || typeof rawResult !== 'object') return null;
+  const { id, scores, styleResult, testedAt } = rawResult;
+  const hasAllScores =
+    scores &&
+    typeof scores.CE === 'number' &&
+    typeof scores.RO === 'number' &&
+    typeof scores.AC === 'number' &&
+    typeof scores.AE === 'number';
+  const hasStyle =
+    styleResult &&
+    typeof styleResult.name === 'string' &&
+    typeof styleResult.horizontal === 'number' &&
+    typeof styleResult.vertical === 'number';
+  const testedAtDate = toDate(testedAt);
+  if (!id || !hasAllScores || !hasStyle || Number.isNaN(testedAtDate.getTime())) {
+    return null;
+  }
+
+  return {
+    id: String(id),
+    scores: { CE: scores.CE, RO: scores.RO, AC: scores.AC, AE: scores.AE },
+    styleResult: {
+      name: styleResult.name,
+      horizontal: styleResult.horizontal,
+      vertical: styleResult.vertical,
+    },
+    testedAt: testedAtDate.toISOString(),
+  };
+}
+
+function loadSavedResultHistory() {
+  try {
+    const rawValue = localStorage.getItem(RESULT_HISTORY_STORAGE_KEY);
+    if (!rawValue) return [];
+    const parsed = JSON.parse(rawValue);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map(normalizeSavedResult).filter(Boolean).slice(0, RESULT_HISTORY_LIMIT);
+  } catch (error) {
+    return [];
+  }
+}
+
+function persistSavedResultHistory() {
+  try {
+    localStorage.setItem(RESULT_HISTORY_STORAGE_KEY, JSON.stringify(savedResultHistory));
+  } catch (error) {
+    // Ignore storage errors (quota/private mode), while keeping in-memory history.
+  }
+}
+
+function renderSavedResultHistory() {
+  resultHistoryList.innerHTML = '';
+
+  if (savedResultHistory.length === 0) {
+    resultHistoryEmpty.classList.remove('hidden');
+    return;
+  }
+
+  resultHistoryEmpty.classList.add('hidden');
+  savedResultHistory.forEach((resultItem) => {
+    const item = document.createElement('li');
+    item.className = 'history-item';
+
+    const copyWrap = document.createElement('div');
+    const title = document.createElement('p');
+    title.className = 'history-title';
+    title.textContent = `${resultItem.styleResult.name} · ${resultItem.scores.CE}/${resultItem.scores.RO}/${resultItem.scores.AC}/${resultItem.scores.AE}`;
+
+    const meta = document.createElement('p');
+    meta.className = 'history-meta';
+    meta.textContent = formatTestedAt(resultItem.testedAt);
+    copyWrap.append(title, meta);
+
+    const viewButton = document.createElement('button');
+    viewButton.type = 'button';
+    viewButton.className = 'text-link history-view-button';
+    viewButton.dataset.historyId = resultItem.id;
+    viewButton.textContent = 'View result';
+
+    item.append(copyWrap, viewButton);
+    resultHistoryList.append(item);
+  });
+}
+
+function createResultSnapshot(scores, styleResult, testedAt) {
+  const testedAtIso = toDate(testedAt).toISOString();
+  return {
+    id: `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`,
+    scores: { ...scores },
+    styleResult: { ...styleResult },
+    testedAt: testedAtIso,
+  };
+}
+
+function appendResultToHistory(snapshot) {
+  savedResultHistory = [snapshot, ...savedResultHistory].slice(0, RESULT_HISTORY_LIMIT);
+  persistSavedResultHistory();
+  renderSavedResultHistory();
+}
+
+function loadSavedResultById(resultId) {
+  const savedResult = savedResultHistory.find((item) => item.id === resultId);
+  if (!savedResult) return;
+  latestResultSnapshot = {
+    id: savedResult.id,
+    scores: { ...savedResult.scores },
+    styleResult: { ...savedResult.styleResult },
+    testedAt: savedResult.testedAt,
+  };
+  renderResults(savedResult.scores, savedResult.styleResult, savedResult.testedAt);
 }
 
 function isValidOrEmptyEmailAddress(emailAddress) {
@@ -713,13 +840,9 @@ form.addEventListener('submit', (event) => {
 
   const scores = calculateScores();
   const styleResult = determineStyle(scores);
-  const testedAt = new Date();
-  latestResultSnapshot = {
-    scores: { ...scores },
-    styleResult: { ...styleResult },
-    testedAt,
-  };
-  renderResults(scores, styleResult, testedAt);
+  latestResultSnapshot = createResultSnapshot(scores, styleResult, new Date());
+  appendResultToHistory(latestResultSnapshot);
+  renderResults(scores, styleResult, latestResultSnapshot.testedAt);
   formError.textContent = '';
   emailError.textContent = '';
 });
@@ -737,4 +860,18 @@ resetButton.addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
+resultHistoryList.addEventListener('click', (event) => {
+  const viewButton = event.target.closest('.history-view-button');
+  if (!viewButton) return;
+  loadSavedResultById(viewButton.dataset.historyId);
+});
+
+historyClearButton.addEventListener('click', () => {
+  savedResultHistory = [];
+  persistSavedResultHistory();
+  renderSavedResultHistory();
+});
+
+savedResultHistory = loadSavedResultHistory();
 renderQuestions();
+renderSavedResultHistory();

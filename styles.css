@@ -471,6 +471,10 @@ button:not(.rank-btn):not(.word-hint):active {
   margin-top: 18px;
 }
 
+.result-history-card {
+  margin-top: 18px;
+}
+
 .summary-meta {
   margin-bottom: 14px;
   color: var(--muted);
@@ -506,6 +510,69 @@ button:not(.rank-btn):not(.word-hint):active {
   color: var(--danger);
   font-size: 0.88rem;
   font-weight: 600;
+}
+
+.history-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.history-clear-button {
+  min-height: 38px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+}
+
+.history-empty {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.history-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.history-list:empty {
+  display: none;
+}
+
+.history-item {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  padding: 12px 14px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.history-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.history-title {
+  margin: 0;
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.history-view-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
 }
 
 /* ── Bar chart ───────────────────────────── */
