@@ -435,11 +435,19 @@ function formatTestedAt(dateValue) {
   }).format(dateValue);
 }
 
-function formatSubjectDate(dateValue) {
+function formatEmailSubjectDate(dateValue) {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'short',
     timeStyle: 'short',
   }).format(dateValue);
+}
+
+function isValidEmailAddress(emailAddress) {
+  if (!emailAddress) return true;
+  const emailInput = document.createElement('input');
+  emailInput.type = 'email';
+  emailInput.value = emailAddress;
+  return emailInput.checkValidity();
 }
 
 function buildEmailBody(resultData) {
@@ -477,9 +485,15 @@ function sendResultByEmail() {
   }
 
   const recipient = emailRecipientInput.value.trim();
-  const subject = `Learning Styles Result (${formatSubjectDate(latestResultSnapshot.testedAt)})`;
+  if (!isValidEmailAddress(recipient)) {
+    formError.textContent = 'Please enter a valid email address before sending.';
+    return;
+  }
+
+  const subject = `Learning Styles Result (${formatEmailSubjectDate(latestResultSnapshot.testedAt)})`;
   const body = buildEmailBody(latestResultSnapshot);
   const mailtoUrl = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  formError.textContent = '';
   window.location.href = mailtoUrl;
 }
 
