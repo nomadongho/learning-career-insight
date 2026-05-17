@@ -153,6 +153,10 @@ const axisDesc = document.querySelector('#axis-desc');
 const resetButton = document.querySelector('#reset-button');
 
 // ── Word tooltip ──────────────────────────────────────────────────────────────
+const TOOLTIP_VIEWPORT_PAD = 8;
+const TOOLTIP_FLIP_CLEARANCE = 16;
+const TOOLTIP_SPACING = 10;
+
 const wordTooltip = document.createElement('div');
 wordTooltip.className = 'word-tooltip hidden';
 wordTooltip.setAttribute('role', 'tooltip');
@@ -183,7 +187,7 @@ function showWordTooltip(btn) {
 
   let centerX = btnRect.left + btnRect.width / 2;
   const halfW = tooltipRect.width / 2;
-  const clampedX = Math.max(halfW + 8, Math.min(centerX, window.innerWidth - halfW - 8));
+  const clampedX = Math.max(halfW + TOOLTIP_VIEWPORT_PAD, Math.min(centerX, window.innerWidth - halfW - TOOLTIP_VIEWPORT_PAD));
 
   // Arrow stays aligned with the button center even if tooltip shifted
   const arrowOffset = centerX - clampedX;
@@ -191,12 +195,12 @@ function showWordTooltip(btn) {
   wordTooltip.style.left = `${clampedX}px`;
 
   const spaceAbove = btnRect.top;
-  if (spaceAbove < tooltipRect.height + 16) {
+  if (spaceAbove < tooltipRect.height + TOOLTIP_FLIP_CLEARANCE) {
     // Not enough room above – show below
     wordTooltip.classList.add('word-tooltip--below');
-    wordTooltip.style.top = `${btnRect.bottom + 10}px`;
+    wordTooltip.style.top = `${btnRect.bottom + TOOLTIP_SPACING}px`;
   } else {
-    wordTooltip.style.top = `${btnRect.top - tooltipRect.height - 10}px`;
+    wordTooltip.style.top = `${btnRect.top - tooltipRect.height - TOOLTIP_SPACING}px`;
   }
 }
 
