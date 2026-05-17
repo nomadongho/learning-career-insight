@@ -305,6 +305,13 @@ function loadResultById(resultId) {
     ...savedResult,
     responses: Array.isArray(savedResult.responses) ? [...savedResult.responses] : null,
   };
+  if (Array.isArray(latestResultSnapshot.responses)) {
+    latestResultSnapshot.responses.forEach((value, index) => {
+      answers[index] = value;
+    });
+  }
+  if (nicknameInput) nicknameInput.value = savedResult.nickname || '';
+  renderQuestions();
   renderResult(
     {
       deepTotal: savedResult.deepTotal,
