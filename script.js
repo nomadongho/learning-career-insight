@@ -152,6 +152,11 @@ const styleDescription = document.querySelector('#style-description');
 const axisSummary = document.querySelector('#axis-summary');
 const axisDesc = document.querySelector('#axis-desc');
 const resetButton = document.querySelector('#reset-button');
+const testedAtValue = document.querySelector('#tested-at-value');
+const emailRecipientInput = document.querySelector('#email-recipient');
+const emailSendButton = document.querySelector('#email-send-button');
+
+let latestResultSnapshot = null;
 
 // ── Word tooltip ──────────────────────────────────────────────────────────────
 const TOOLTIP_VIEWPORT_PAD = 8;
@@ -423,6 +428,61 @@ function determineStyle(scores) {
   return { name: 'Diverging', horizontal, vertical };
 }
 
+function formatTestedAt(dateValue) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'full',
+    timeStyle: 'medium',
+  }).format(dateValue);
+}
+
+function formatSubjectDate(dateValue) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(dateValue);
+}
+
+function buildEmailBody(resultData) {
+  const { scores, styleResult, testedAt } = resultData;
+  const lines = [
+    'Learning Styles Assessment Result',
+    '',
+    `Tested at: ${formatTestedAt(testedAt)}`,
+    '',
+    'Dominant style',
+    `- Name: ${styleResult.name}`,
+    `- Combination: ${styleMeta[styleResult.name].combination}`,
+    '',
+    'Dimension totals',
+    `- CE: ${scores.CE}`,
+    `- RO: ${scores.RO}`,
+    `- AC: ${scores.AC}`,
+    `- AE: ${scores.AE}`,
+    '',
+    'Graph data for comparison',
+    `- Bar chart values: CE=${scores.CE}, RO=${scores.RO}, AC=${scores.AC}, AE=${scores.AE}`,
+    `- Diamond axis values: AE(top)=${scores.AE}, AC(right)=${scores.AC}, RO(bottom)=${scores.RO}, CE(left)=${scores.CE}`,
+    '',
+    'Orientation',
+    `- AC - CE: ${styleResult.horizontal}`,
+    `- AE - RO: ${styleResult.vertical}`,
+  ];
+
+  return lines.join('\n');
+}
+
+function sendResultByEmail() {
+  if (!latestResultSnapshot) {
+    return;
+  }
+
+  const recipient = emailRecipientInput.value.trim();
+  const subject = `Learning Styles Result (${formatSubjectDate(latestResultSnapshot.testedAt)})`;
+  const body = buildEmailBody(latestResultSnapshot);
+  const mailtoUrl = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailtoUrl;
+}
+
 function renderScoreCards(scores) {
   scoreGrid.innerHTML = '';
 
@@ -592,7 +652,7 @@ function renderAxisChart(scores) {
   axisChart.replaceChildren(...els);
 }
 
-function renderResults(scores, styleResult) {
+function renderResults(scores, styleResult, testedAt) {
   renderScoreCards(scores);
   renderBarChart(scores);
   renderAxisChart(scores);
@@ -603,6 +663,7 @@ function renderResults(scores, styleResult) {
   styleDescription.textContent = style.description;
   axisSummary.textContent = `CE ${scores.CE} · RO ${scores.RO} · AC ${scores.AC} · AE ${scores.AE}`;
   axisDesc.textContent = `Orientation: AC − CE = ${styleResult.horizontal}, AE − RO = ${styleResult.vertical}`;
+  testedAtValue.textContent = formatTestedAt(testedAt);
 
   resultsSection.classList.remove('hidden');
   resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -629,15 +690,25 @@ form.addEventListener('submit', (event) => {
 
   const scores = calculateScores();
   const styleResult = determineStyle(scores);
-  renderResults(scores, styleResult);
+  const testedAt = new Date();
+  latestResultSnapshot = {
+    scores: { ...scores },
+    styleResult: { ...styleResult },
+    testedAt,
+  };
+  renderResults(scores, styleResult, testedAt);
   formError.textContent = '';
 });
+
+emailSendButton.addEventListener('click', sendResultByEmail);
 
 resetButton.addEventListener('click', () => {
   answers.forEach((row) => row.fill(''));
   renderQuestions();
   formError.textContent = '';
   resultsSection.classList.add('hidden');
+  testedAtValue.textContent = '—';
+  latestResultSnapshot = null;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 

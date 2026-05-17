@@ -467,6 +467,39 @@ button:not(.rank-btn):not(.word-hint):active {
   background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%);
 }
 
+.result-share-card {
+  margin-top: 18px;
+}
+
+.summary-meta {
+  margin-bottom: 14px;
+  color: var(--muted);
+}
+
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.email-input {
+  flex: 1;
+  min-width: 240px;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--text);
+}
+
+.share-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
 /* ── Bar chart ───────────────────────────── */
 .bar-chart {
   display: grid;
