@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Career Choice Factors</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Assessment 3 of 3</p>
+        <h1>3 Factors of Career Choice</h1>
+        <p class="description">
+          Enter your intended career, then rate how strongly each source influences your career decision.
+        </p>
+        <div class="hero-actions">
+          <a class="button" href="#assessment">Start assessment</a>
+          <a class="button button-secondary" href="./career-choice-history.html">View saved results</a>
+          <a class="button button-secondary" href="./surface-deep.html">Back to assessment 2</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h2>Response guide</h2>
+        <ul>
+          <li>5 = very influential</li>
+          <li>4 = influential</li>
+          <li>3 = not so influential</li>
+          <li>2 = unimportant</li>
+          <li>1 = very unimportant</li>
+        </ul>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <section class="panel" id="assessment">
+        <div class="section-heading">
+          <div>
+            <p class="section-label">Question set</p>
+            <h2>Rate each influence source</h2>
+          </div>
+          <div class="progress-wrap">
+            <p id="career-progress-label" class="progress-text">0 of 7 answered</p>
+            <div class="progress-bar-track" aria-hidden="true">
+              <div id="career-progress-fill" class="progress-bar-fill" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <form id="career-assessment-form" novalidate>
+          <article class="question-card">
+            <div class="question-top">
+              <div class="question-left">
+                <span class="row-badge">★</span>
+                <p class="question-note">What career do you intend to pursue?</p>
+              </div>
+            </div>
+            <input
+              id="career-intent-input"
+              class="email-input"
+              type="text"
+              placeholder="e.g. Software engineer"
+              autocomplete="off"
+            />
+          </article>
+
+          <div id="career-question-list" class="question-list"></div>
+          <p id="career-form-error" class="form-error" aria-live="polite"></p>
+
+          <div class="actions">
+            <button class="button" type="submit">Show my result</button>
+            <button class="button button-secondary" type="button" id="career-reset-button">Reset answers</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel results-panel hidden" id="career-results" aria-live="polite">
+        <div class="section-heading results-heading">
+          <div>
+            <p class="section-label">Result</p>
+            <h2>Your career decision profile</h2>
+          </div>
+          <a class="text-link" href="#assessment">Edit answers</a>
+        </div>
+
+        <div class="result-summary">
+          <article class="summary-card accent-card">
+            <p class="summary-label">Intended career</p>
+            <h3 id="career-intent-result">—</h3>
+            <p class="summary-value" id="career-dominant-factor">—</p>
+            <p id="career-dominant-description"></p>
+          </article>
+          <article class="summary-card">
+            <p class="summary-label">Tested at</p>
+            <p class="summary-value" id="career-tested-at">—</p>
+          </article>
+        </div>
+
+        <article class="chart-card">
+          <div class="chart-heading">
+            <h3>Average influence by factor (1–5)</h3>
+            <p>Higher score means stronger influence in your current career choice.</p>
+          </div>
+          <div id="career-bar-chart" class="bar-chart bar-chart-triple"></div>
+        </article>
+
+        <article class="summary-card result-share-card">
+          <p class="summary-label">Result sharing</p>
+          <div class="share-actions">
+            <input
+              id="career-email-recipient"
+              class="email-input"
+              type="email"
+              placeholder="recipient@example.com (optional)"
+              autocomplete="email"
+            />
+            <button class="button button-secondary" type="button" id="career-email-send-button">Email this result</button>
+          </div>
+          <p id="career-email-error" class="share-error" aria-live="polite"></p>
+        </article>
+
+        <article class="summary-card result-history-card">
+          <div class="history-header">
+            <p class="summary-label">Saved results</p>
+            <button class="button button-secondary history-clear-button" type="button" id="career-history-clear-button">
+              Clear history
+            </button>
+          </div>
+          <p id="career-history-empty" class="history-empty">No saved results yet.</p>
+          <ul id="career-history-list" class="history-list"></ul>
+        </article>
+      </section>
+    </main>
+
+    <script src="./career-choice-history-store.js"></script>
+    <script src="./career-choice.js"></script>
+  </body>
+</html>
