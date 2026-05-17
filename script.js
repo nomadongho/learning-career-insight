@@ -352,6 +352,7 @@ function createSvgNode(tagName, attributes = {}, textContent = '') {
   return node;
 }
 
+// Renders a 4-axis diamond chart. scores: { CE, RO, AC, AE } — raw totals from calculateScores().
 function renderAxisChart(scores) {
   const size = 360;
   const center = 180;
