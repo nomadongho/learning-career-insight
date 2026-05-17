@@ -155,8 +155,11 @@ const resetButton = document.querySelector('#reset-button');
 const testedAtValue = document.querySelector('#tested-at-value');
 const emailRecipientInput = document.querySelector('#email-recipient');
 const emailSendButton = document.querySelector('#email-send-button');
+const emailError = document.querySelector('#email-error');
 
 let latestResultSnapshot = null;
+const emailValidationInput = document.createElement('input');
+emailValidationInput.type = 'email';
 
 // ── Word tooltip ──────────────────────────────────────────────────────────────
 const TOOLTIP_VIEWPORT_PAD = 8;
@@ -444,16 +447,15 @@ function formatEmailSubjectDate(dateValue) {
 
 function isValidEmailAddress(emailAddress) {
   if (!emailAddress) return true;
-  const emailInput = document.createElement('input');
-  emailInput.type = 'email';
-  emailInput.value = emailAddress;
-  return emailInput.checkValidity();
+  emailValidationInput.value = emailAddress;
+  return emailValidationInput.checkValidity();
 }
 
 function buildEmailBody(resultData) {
   const { scores, styleResult, testedAt } = resultData;
   const styleInfo = styleMeta[styleResult.name] ?? {
     combination: 'Unknown',
+    description: 'No style description is available for this result.',
   };
   const lines = [
     'Learning Styles Assessment Result',
@@ -489,14 +491,14 @@ function sendResultByEmail() {
 
   const recipient = emailRecipientInput.value.trim();
   if (!isValidEmailAddress(recipient)) {
-    formError.textContent = 'Please enter a valid email address or leave it empty.';
+    emailError.textContent = 'Please enter a valid email address or leave it empty.';
     return;
   }
 
   const subject = `Learning Styles Result (${formatEmailSubjectDate(latestResultSnapshot.testedAt)})`;
   const body = buildEmailBody(latestResultSnapshot);
   const mailtoUrl = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  formError.textContent = '';
+  emailError.textContent = '';
   window.location.href = mailtoUrl;
 }
 
@@ -718,6 +720,7 @@ form.addEventListener('submit', (event) => {
   };
   renderResults(scores, styleResult, testedAt);
   formError.textContent = '';
+  emailError.textContent = '';
 });
 
 emailSendButton.addEventListener('click', sendResultByEmail);
@@ -726,6 +729,7 @@ resetButton.addEventListener('click', () => {
   answers.forEach((row) => row.fill(''));
   renderQuestions();
   formError.textContent = '';
+  emailError.textContent = '';
   resultsSection.classList.add('hidden');
   testedAtValue.textContent = '—';
   latestResultSnapshot = null;
