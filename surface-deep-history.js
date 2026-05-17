@@ -11,6 +11,27 @@ function formatTestedAt(dateValue) {
   }).format(store.toDate(dateValue));
 }
 
+function formatEmailSubjectDate(dateValue) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(store.toDate(dateValue));
+}
+
+function buildEmailBody(resultItem) {
+  const lines = [
+    'Surface vs Deep Learners Result',
+    '',
+    ...(resultItem.nickname ? [`Tester: ${resultItem.nickname}`, ''] : []),
+    `Tested at: ${formatTestedAt(resultItem.testedAt)}`,
+    `Dominant approach: ${resultItem.dominantType}`,
+    '',
+    `Deep total: ${resultItem.deepTotal}`,
+    `Surface total: ${resultItem.surfaceTotal}`,
+  ];
+  return lines.join('\n');
+}
+
 function renderSavedResultHistory(items) {
   resultHistoryList.innerHTML = '';
   if (items.length === 0) {
@@ -26,14 +47,25 @@ function renderSavedResultHistory(items) {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${resultItem.dominantType} | ${store.formatScoreSummary(resultItem)}`;
+    const nicknamePrefix = resultItem.nickname ? `[${resultItem.nickname}] ` : '';
+    title.textContent = `${nicknamePrefix}${resultItem.dominantType} | ${store.formatScoreSummary(resultItem)}`;
 
     const meta = document.createElement('p');
     meta.className = 'history-meta';
     meta.textContent = formatTestedAt(resultItem.testedAt);
     copyWrap.append(title, meta);
 
-    item.append(copyWrap);
+    const emailButton = document.createElement('button');
+    emailButton.type = 'button';
+    emailButton.className = 'text-link history-view-button';
+    emailButton.textContent = 'Email result';
+    emailButton.addEventListener('click', () => {
+      const subject = `Surface vs Deep Result (${formatEmailSubjectDate(resultItem.testedAt)})`;
+      const body = buildEmailBody(resultItem);
+      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+
+    item.append(copyWrap, emailButton);
     resultHistoryList.append(item);
   });
 }

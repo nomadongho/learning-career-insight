@@ -44,6 +44,8 @@ const dominantTypeEl = document.querySelector('#surface-dominant-type');
 const scoreSummaryEl = document.querySelector('#surface-score-summary');
 const dominantDescriptionEl = document.querySelector('#surface-dominant-description');
 const testedAtEl = document.querySelector('#surface-tested-at');
+const testerNameEl = document.querySelector('#surface-tester-name');
+const nicknameInput = document.querySelector('#surface-nickname-input');
 const barChart = document.querySelector('#surface-bar-chart');
 const resetButton = document.querySelector('#surface-reset-button');
 const emailInput = document.querySelector('#surface-email-recipient');
@@ -154,6 +156,9 @@ function setAnswer(questionIndex, answerKey) {
 }
 
 function validateAnswers() {
+  if (!nicknameInput.value.trim()) {
+    return 'Please enter a nickname before submitting.';
+  }
   const missingIndex = answers.findIndex((value) => !value);
   if (missingIndex !== -1) {
     return `Question ${missingIndex + 1} is incomplete.`;
@@ -203,6 +208,7 @@ function createResultSnapshot(resultValues, testedAt) {
     typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : fallbackId;
   return {
     id: snapshotId,
+    nickname: nicknameInput.value.trim(),
     deepTotal: resultValues.deepTotal,
     surfaceTotal: resultValues.surfaceTotal,
     dominantType: resultValues.dominantType,
@@ -246,6 +252,9 @@ function renderResult(resultValues, testedAt) {
   scoreSummaryEl.textContent = `Deep ${resultValues.deepTotal} · Surface ${resultValues.surfaceTotal}`;
   dominantDescriptionEl.textContent = resultValues.dominantDescription;
   testedAtEl.textContent = formatTestedAt(testedAt);
+  if (testerNameEl) {
+    testerNameEl.textContent = latestResultSnapshot && latestResultSnapshot.nickname ? latestResultSnapshot.nickname : '—';
+  }
   renderBarChart(resultValues);
   resultsSection.classList.remove('hidden');
   resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -265,7 +274,8 @@ function renderSavedHistory() {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${itemData.dominantType} | ${store.formatScoreSummary(itemData)}`;
+    const nicknamePrefix = itemData.nickname ? `[${itemData.nickname}] ` : '';
+    title.textContent = `${nicknamePrefix}${itemData.dominantType} | ${store.formatScoreSummary(itemData)}`;
     const meta = document.createElement('p');
     meta.className = 'history-meta';
     meta.textContent = formatTestedAt(itemData.testedAt);
@@ -315,6 +325,7 @@ function buildEmailBody(resultData) {
   return [
     'Surface vs Deep Learners Result',
     '',
+    ...(resultData.nickname ? [`Tester: ${resultData.nickname}`, ''] : []),
     `Tested at: ${formatTestedAt(resultData.testedAt)}`,
     `Dominant approach: ${resultData.dominantType}`,
     '',

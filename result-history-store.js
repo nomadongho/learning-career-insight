@@ -10,7 +10,7 @@
 
   function normalize(rawResult) {
     if (!rawResult || typeof rawResult !== 'object') return null;
-    const { id, scores, styleResult, testedAt } = rawResult;
+    const { id, scores, styleResult, testedAt, nickname } = rawResult;
     const hasAllScores =
       scores &&
       typeof scores.CE === 'number' &&
@@ -29,6 +29,7 @@
 
     return {
       id: String(id),
+      nickname: typeof nickname === 'string' ? nickname : '',
       scores: { CE: scores.CE, RO: scores.RO, AC: scores.AC, AE: scores.AE },
       styleResult: {
         name: styleResult.name,

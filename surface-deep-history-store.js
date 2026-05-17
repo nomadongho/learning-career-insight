@@ -10,7 +10,7 @@
 
   function normalize(rawResult) {
     if (!rawResult || typeof rawResult !== 'object') return null;
-    const { id, deepTotal, surfaceTotal, dominantType, testedAt } = rawResult;
+    const { id, deepTotal, surfaceTotal, dominantType, testedAt, nickname } = rawResult;
     const testedAtDate = toDate(testedAt);
     if (
       !id ||
@@ -24,6 +24,7 @@
 
     return {
       id: String(id),
+      nickname: typeof nickname === 'string' ? nickname : '',
       deepTotal,
       surfaceTotal,
       dominantType,

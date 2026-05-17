@@ -52,6 +52,23 @@
         </div>
 
         <form id="surface-assessment-form" novalidate>
+          <article class="question-card">
+            <div class="question-top">
+              <div class="question-left">
+                <span class="row-badge">★</span>
+                <p class="question-note">Who is taking this test? (nickname)</p>
+              </div>
+            </div>
+            <input
+              id="surface-nickname-input"
+              class="email-input"
+              type="text"
+              placeholder="e.g. Alex"
+              autocomplete="off"
+              maxlength="60"
+            />
+          </article>
+
           <div id="surface-question-list" class="question-list"></div>
           <p id="surface-form-error" class="form-error" aria-live="polite"></p>
           <div class="actions">
@@ -78,7 +95,9 @@
             <p id="surface-dominant-description"></p>
           </article>
           <article class="summary-card">
-            <p class="summary-label">Tested at</p>
+            <p class="summary-label">Tester</p>
+            <p class="summary-value" id="surface-tester-name">—</p>
+            <p class="summary-label summary-label-spaced">Tested at</p>
             <p class="summary-value" id="surface-tested-at">—</p>
           </article>
         </div>

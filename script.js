@@ -154,6 +154,8 @@ const axisSummary = document.querySelector('#axis-summary');
 const axisDesc = document.querySelector('#axis-desc');
 const resetButton = document.querySelector('#reset-button');
 const testedAtValue = document.querySelector('#tested-at-value');
+const testerNameValue = document.querySelector('#tester-name-value');
+const nicknameInput = document.querySelector('#nickname-input');
 const emailRecipientInput = document.querySelector('#email-recipient');
 const emailSendButton = document.querySelector('#email-send-button');
 const emailError = document.querySelector('#email-error');
@@ -389,6 +391,10 @@ function setAnswer(rowIndex, optionIndex, rank) {
 }
 
 function validateAnswers() {
+  if (!nicknameInput.value.trim()) {
+    return 'Please enter a nickname before submitting.';
+  }
+
   for (let rowIndex = 0; rowIndex < answers.length; rowIndex += 1) {
     const row = answers[rowIndex];
 
@@ -480,7 +486,8 @@ function renderSavedResultHistory() {
     const copyWrap = document.createElement('div');
     const title = document.createElement('p');
     title.className = 'history-title';
-    title.textContent = `${resultItem.styleResult.name} | ${resultHistoryStore.formatScoreSummary(resultItem.scores)}`;
+    const nicknamePrefix = resultItem.nickname ? `[${resultItem.nickname}] ` : '';
+    title.textContent = `${nicknamePrefix}${resultItem.styleResult.name} | ${resultHistoryStore.formatScoreSummary(resultItem.scores)}`;
     title.setAttribute(
       'aria-label',
       `Style ${resultItem.styleResult.name}, scores CE ${resultItem.scores.CE}, RO ${resultItem.scores.RO}, AC ${resultItem.scores.AC}, AE ${resultItem.scores.AE}`,
@@ -512,6 +519,7 @@ function createResultSnapshot(scores, styleResult, testedAt) {
       : fallbackId;
   return {
     id: snapshotId,
+    nickname: nicknameInput.value.trim(),
     scores: { ...scores },
     styleResult: { ...styleResult },
     testedAt: testedAtIso,
@@ -529,6 +537,7 @@ function loadSavedResultById(resultId) {
   if (!savedResult) return;
   latestResultSnapshot = {
     id: savedResult.id,
+    nickname: savedResult.nickname || '',
     scores: { ...savedResult.scores },
     styleResult: { ...savedResult.styleResult },
     testedAt: savedResult.testedAt,
@@ -543,7 +552,7 @@ function isValidOrEmptyEmailAddress(emailAddress) {
 }
 
 function buildEmailBody(resultData) {
-  const { scores, styleResult, testedAt } = resultData;
+  const { scores, styleResult, testedAt, nickname } = resultData;
   const styleInfo = styleMeta[styleResult.name] ?? {
     combination: 'Unknown',
     description: 'No style description is available for this result.',
@@ -552,6 +561,7 @@ function buildEmailBody(resultData) {
   const lines = [
     'Learning Styles Assessment Result',
     '',
+    ...(nickname ? [`Tester: ${nickname}`, ''] : []),
     `Tested at: ${formatTestedAt(testedAt)}`,
     '',
     'Dominant style',
@@ -778,6 +788,9 @@ function renderResults(scores, styleResult, testedAt) {
   axisSummary.textContent = `CE ${scores.CE} · RO ${scores.RO} · AC ${scores.AC} · AE ${scores.AE}`;
   axisDesc.textContent = `Orientation: AC − CE = ${styleResult.horizontal}, AE − RO = ${styleResult.vertical}`;
   testedAtValue.textContent = formatTestedAt(testedAt);
+  if (testerNameValue) {
+    testerNameValue.textContent = latestResultSnapshot && latestResultSnapshot.nickname ? latestResultSnapshot.nickname : '—';
+  }
 
   resultsSection.classList.remove('hidden');
   resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
